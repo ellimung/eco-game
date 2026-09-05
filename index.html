@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>에코 에이전트 : 지구를 청소하라!</title>
+  <title>에코 에이전트 : 숨은 자원 찾기 대작전!</title>
   <!-- Tailwind CSS & Lucide Icons & Confetti -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -23,128 +23,167 @@
       25% { transform: translateX(-8px); }
       75% { transform: translateX(8px); }
     }
-    .glow { filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.9)); }
+    /* 숨은그림 맵 스크롤바 커스텀 */
+    #hidden-map-container::-webkit-scrollbar { width: 8px; height: 8px; }
+    #hidden-map-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-900 via-slate-900 to-emerald-950 min-h-screen text-slate-800 flex flex-col justify-between select-none overflow-x-hidden">
+<body class="bg-gradient-to-br from-amber-100 via-orange-50 to-emerald-100 min-h-screen text-slate-800 flex flex-col justify-between select-none overflow-x-hidden">
 
   <!-- ================= 상단 게임 상태 바 ================= -->
-  <header id="game-header" class="hidden p-3 sm:p-4 max-w-5xl w-full mx-auto flex justify-between items-center text-white">
+  <header id="game-header" class="hidden p-3 sm:p-4 max-w-6xl w-full mx-auto flex justify-between items-center bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-amber-200 mt-2">
     <div class="flex items-center gap-2">
-      <span class="bg-emerald-500/30 border border-emerald-400/40 p-2 rounded-xl text-xl shadow-lg">🌍</span>
+      <span class="bg-amber-500 text-white p-2 rounded-xl text-lg shadow">🔍</span>
       <div>
-        <h1 class="font-black text-sm sm:text-base tracking-tight text-emerald-300">에코 에이전트</h1>
-        <p id="header-user-tag" class="text-[11px] text-slate-300 font-bold">대기 중</p>
+        <h1 class="font-black text-sm sm:text-base text-slate-800">에코 에이전트 : 숨은그림찾기</h1>
+        <p id="header-user-tag" class="text-[11px] text-amber-800 font-bold">대기 중</p>
       </div>
     </div>
     
-    <div class="flex items-center gap-2 sm:gap-3">
-      <div class="bg-white/10 backdrop-blur border border-white/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-black text-xs sm:text-sm">
+    <div class="flex items-center gap-3">
+      <div class="bg-amber-100 px-3 py-1.5 rounded-xl flex items-center gap-1 font-black text-xs sm:text-sm text-amber-900 border border-amber-300">
         <span>⭐ 점수:</span>
-        <span id="global-score" class="text-yellow-400 font-black">0</span>
+        <span id="global-score" class="text-amber-700 font-black">0</span>
       </div>
-      <button onclick="toggleSound()" id="sound-btn" class="bg-white/10 hover:bg-white/20 p-2 rounded-xl text-white transition">
+      <button onclick="toggleSound()" id="sound-btn" class="bg-slate-100 hover:bg-slate-200 p-2 rounded-xl text-slate-700 transition border border-slate-300">
         <i data-lucide="volume-2" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
 
-  <!-- ================= 메인 게임 컨테이너 ================= -->
-  <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-center items-center">
+  <!-- ================= 메인 컨테이너 ================= -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-center items-center">
 
-    <!-- ================= 0. [첫 페이지: 로그인 및 출동 준비] ================= -->
-    <div id="screen-login" class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-2 border-emerald-400/50 max-w-md w-full space-y-6 bounce-in">
+    <!-- ================= 0. [첫 페이지: 로그인] ================= -->
+    <div id="screen-login" class="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-amber-300 max-w-md w-full space-y-6 bounce-in">
       <div class="text-center space-y-2">
-        <div class="inline-block p-4 bg-emerald-100 rounded-3xl text-5xl mb-1 shadow-inner animate-bounce">♻️</div>
-        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">에코 에이전트 : 지구 청소 작전</h2>
-        <p class="text-xs sm:text-sm text-slate-500 font-medium">어질러진 장소에서 쓰레기를 찾아 올바르게 분리배출하세요!</p>
+        <div class="inline-block p-4 bg-amber-100 rounded-3xl text-5xl mb-1 shadow-inner animate-bounce">🗺️</div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">숨은 자원 찾기 대작전</h2>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium">어질러진 복잡한 장소 속 숨겨진 10개의 쓰레기를 찾고 분리배출하세요!</p>
       </div>
 
       <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-black text-slate-700 mb-1">학교 이름 <span class="text-red-500">*</span></label>
-          <input type="text" id="input-school" required placeholder="예: 서울초등학교" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <input type="text" id="input-school" required placeholder="예: 서울초등학교" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none">
         </div>
 
         <div>
           <label class="block text-xs font-black text-slate-700 mb-1">학번 및 이름 <span class="text-red-500">*</span></label>
-          <input type="text" id="input-id-name" required placeholder="예: 50119 홍길동 (학년/반/번호/이름)" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <input type="text" id="input-id-name" required placeholder="예: 50119 홍길동 (학년/반/번호/이름)" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none">
         </div>
 
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base flex items-center justify-center gap-2 mt-2">
-          <span>🚀 출동 준비 완료 (확인)</span>
+        <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base flex items-center justify-center gap-2 mt-2">
+          <span>🚀 확인 및 난이도 선택</span>
         </button>
       </form>
     </div>
 
-    <!-- ================= 1. [1단계: 10개 숨은그림찾기 & 분리수거 드래그] ================= -->
+    <!-- ================= 0-1. [난이도 선택 화면] ================= -->
+    <div id="screen-diff" class="hidden bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-amber-300 max-w-lg w-full space-y-6 bounce-in text-center">
+      <div class="space-y-1">
+        <span class="bg-amber-100 text-amber-800 text-xs font-black px-3 py-1 rounded-full border border-amber-300">STAGE 1</span>
+        <h3 class="text-2xl font-black text-slate-800">탐색 난이도를 선택하세요!</h3>
+        <p class="text-xs text-slate-500">난이도가 높을수록 그림이 훨씬 복잡하고 정밀하게 숨겨집니다.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- 초급 -->
+        <button onclick="startStage1('easy')" class="bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-400 p-4 rounded-2xl text-center space-y-2 transition active:scale-95 shadow-sm group">
+          <div class="text-4xl group-hover:scale-110 transition">🐣</div>
+          <div class="font-black text-emerald-900 text-sm">초급 탐색</div>
+          <div class="text-[11px] text-emerald-700">기본 배경 사물 35개<br>비교적 찾기 쉬움</div>
+        </button>
+
+        <!-- 중급 -->
+        <button onclick="startStage1('normal')" class="bg-blue-50 hover:bg-blue-100 border-2 border-blue-400 p-4 rounded-2xl text-center space-y-2 transition active:scale-95 shadow-sm group">
+          <div class="text-4xl group-hover:scale-110 transition">⚖️</div>
+          <div class="font-black text-blue-900 text-sm">중급 탐색</div>
+          <div class="text-[11px] text-blue-700">복잡한 배경 사물 65개<br>표준 난이도</div>
+        </button>
+
+        <!-- 고급 -->
+        <button onclick="startStage1('hard')" class="bg-rose-50 hover:bg-rose-100 border-2 border-rose-400 p-4 rounded-2xl text-center space-y-2 transition active:scale-95 shadow-sm group">
+          <div class="text-4xl group-hover:scale-110 transition">🔥</div>
+          <div class="font-black text-rose-900 text-sm">고급 탐색</div>
+          <div class="text-[11px] text-rose-700">초밀집 사물 100개+<br>정밀 위장된 쓰레기</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= 1. [1단계: 복합 밀집형 숨은그림찾기 맵] ================= -->
     <div id="screen-stage1" class="hidden w-full space-y-3 bounce-in">
       
-      <!-- 상단 상태 & 마이너스 카운터 -->
-      <div class="bg-white/90 backdrop-blur rounded-2xl p-3 sm:p-4 shadow-lg flex justify-between items-center border border-white/40">
+      <!-- 상단 카운터 & 안내 바 -->
+      <div class="bg-white rounded-2xl p-3 sm:p-4 shadow-md flex flex-wrap justify-between items-center border border-amber-200 gap-2">
         <div class="flex items-center gap-2">
-          <span class="bg-emerald-100 text-emerald-800 font-black text-xs px-3 py-1 rounded-full">1단계 미션</span>
-          <span id="s1-scene-title" class="font-extrabold text-xs sm:text-sm text-slate-800">📍 장소: 어질러진 놀이동산</span>
+          <span class="bg-amber-500 text-white font-black text-xs px-3 py-1 rounded-full shadow-sm">1단계 미션</span>
+          <span id="s1-status-text" class="font-extrabold text-xs sm:text-sm text-slate-800">🔍 복잡한 그림 속 숨은 쓰레기를 찾아 터치하세요!</span>
         </div>
 
-        <!-- ⭐ 마이너스 카운터 (10 -> 0) -->
-        <div class="bg-red-500 text-white font-black px-4 py-1.5 rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-1.5 animate-pulse">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-          <span>남은 쓰레기: <span id="s1-countdown" class="text-yellow-300 text-base">10</span>개</span>
+        <!-- ⭐ 마이너스 카운팅 (10 -> 0) -->
+        <div class="bg-rose-500 text-white font-black px-4 py-1.5 rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-1.5">
+          <i data-lucide="target" class="w-4 h-4 animate-spin"></i>
+          <span>남은 쓰레기: <span id="s1-countdown" class="text-yellow-300 text-base sm:text-lg">10</span> / 10개</span>
         </div>
       </div>
 
-      <!-- 숨은그림찾기 게임 맵 (가상 씬 뷰포트) -->
-      <div id="s1-map-viewport" class="relative w-full h-[360px] sm:h-[420px] bg-slate-800 rounded-3xl border-4 border-slate-300/80 overflow-hidden shadow-2xl">
-        <!-- 동적 배경 그래픽 장식 -->
-        <div id="s1-bg-elements" class="absolute inset-0 pointer-events-none"></div>
+      <!-- ⭐ [초밀집 숨은그림찾기 일러스트 맵 뷰포트] -->
+      <div id="hidden-map-container" class="relative w-full h-[400px] sm:h-[480px] bg-[#fef3c7] rounded-3xl border-4 border-amber-400 overflow-auto shadow-2xl p-2">
+        
+        <!-- 맵 캔버스 (확대 탐색 가능한 1200x800 대형 일러스트 공간) -->
+        <div id="hidden-map-canvas" class="relative w-[1000px] sm:w-[1200px] h-[750px] bg-[#fef9c3] rounded-2xl border-2 border-amber-200 overflow-hidden shadow-inner">
+          
+          <!-- 레이어 1: 수십~수백 개의 빽빽한 배경 사물들 (나무, 텐트, 건물, 사람, 분수 등) -->
+          <div id="map-bg-clutter" class="absolute inset-0 pointer-events-none select-none"></div>
 
-        <!-- 10개의 숨겨진 쓰레기 아이템들 (JS로 동적 배치) -->
-        <div id="s1-items-layer" class="absolute inset-0"></div>
+          <!-- 레이어 2: 랜덤 10개 숨겨진 쓰레기 아이템 레이어 -->
+          <div id="map-trash-layer" class="absolute inset-0"></div>
+        </div>
 
-        <!-- 아이템 주웠을 때 안내 오버레이 -->
-        <div id="s1-item-picked-tray" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-5 py-2.5 rounded-2xl border-2 border-yellow-400 shadow-2xl flex items-center gap-3 z-30 animate-bounce">
-          <span id="picked-emoji" class="text-3xl">🧴</span>
+        <!-- 주운 아이템 안내 플로팅 배너 -->
+        <div id="s1-item-picked-tray" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white px-6 py-3 rounded-2xl border-2 border-yellow-400 shadow-2xl flex items-center gap-3 z-40 animate-bounce">
+          <span id="picked-emoji" class="text-4xl">🧴</span>
           <div class="text-left">
-            <div id="picked-name" class="font-black text-xs sm:text-sm text-yellow-300">투명 페트병</div>
-            <div class="text-[11px] text-slate-300">아래 알맞은 분리수거통으로 드래그하거나 터치하세요!</div>
+            <div id="picked-name" class="font-black text-sm text-yellow-300">투명 페트병</div>
+            <div class="text-[11px] text-slate-300">아래 4개 분리수거통 중 알맞은 곳을 클릭/터치하세요!</div>
           </div>
         </div>
       </div>
 
-      <!-- 하단 4색 분리수거함 (드롭 타겟) -->
+      <!-- 하단 4색 분리수거함 -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
-        <div id="bin-plastic" onclick="handleBinDrop('plastic')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'plastic')" class="bg-yellow-100/95 hover:bg-yellow-200 border-4 border-yellow-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+        <div onclick="handleBinDrop('plastic')" class="bg-yellow-100 hover:bg-yellow-200 border-4 border-yellow-400 p-3 rounded-2xl text-center space-y-1 shadow-md transition active:scale-95 cursor-pointer">
           <div class="text-3xl">🟡</div>
           <div class="text-xs font-black text-yellow-900">플라스틱 / PET</div>
-          <div class="text-[10px] text-yellow-700 font-semibold">페트병, 배달용기 등</div>
+          <div class="text-[10px] text-yellow-700 font-semibold">페트병, 배달용기, 샴푸통</div>
         </div>
 
-        <div id="bin-can-glass" onclick="handleBinDrop('can_glass')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'can_glass')" class="bg-blue-100/95 hover:bg-blue-200 border-4 border-blue-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+        <div onclick="handleBinDrop('can_glass')" class="bg-blue-100 hover:bg-blue-200 border-4 border-blue-400 p-3 rounded-2xl text-center space-y-1 shadow-md transition active:scale-95 cursor-pointer">
           <div class="text-3xl">🔵</div>
           <div class="text-xs font-black text-blue-900">캔류 / 유리병</div>
-          <div class="text-[10px] text-blue-700 font-semibold">음료수캔, 탄산수병 등</div>
+          <div class="text-[10px] text-blue-700 font-semibold">음료수캔, 탄산수병, 참치캔</div>
         </div>
 
-        <div id="bin-paper-vinyl" onclick="handleBinDrop('paper_vinyl')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'paper_vinyl')" class="bg-emerald-100/95 hover:bg-emerald-200 border-4 border-emerald-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+        <div onclick="handleBinDrop('paper_vinyl')" class="bg-emerald-100 hover:bg-emerald-200 border-4 border-emerald-400 p-3 rounded-2xl text-center space-y-1 shadow-md transition active:scale-95 cursor-pointer">
           <div class="text-3xl">🟢</div>
           <div class="text-xs font-black text-emerald-900">종이류 / 비닐류</div>
-          <div class="text-[10px] text-emerald-700 font-semibold">박스, 깨끗한 과자봉지</div>
+          <div class="text-[10px] text-emerald-700 font-semibold">박스, 깨끗한 과자비닐</div>
         </div>
 
-        <div id="bin-trash" onclick="handleBinDrop('trash')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'trash')" class="bg-red-100/95 hover:bg-red-200 border-4 border-red-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+        <div onclick="handleBinDrop('trash')" class="bg-rose-100 hover:bg-rose-200 border-4 border-rose-400 p-3 rounded-2xl text-center space-y-1 shadow-md transition active:scale-95 cursor-pointer">
           <div class="text-3xl">🔴</div>
-          <div class="text-xs font-black text-red-900">일반쓰레기 (종량제)</div>
-          <div class="text-[10px] text-red-700 font-semibold">양념 묻은 피자박스 등</div>
+          <div class="text-xs font-black text-rose-900">일반쓰레기 (종량제)</div>
+          <div class="text-[10px] text-rose-700 font-semibold">양념 묻은 피자박스, 빨대 등</div>
         </div>
       </div>
     </div>
 
     <!-- ================= 2. [2단계: X-Ray 마크 스캐너] ================= -->
-    <div id="screen-stage2" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/40 space-y-5 bounce-in max-w-xl w-full">
+    <div id="screen-stage2" class="hidden bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-blue-400 max-w-xl w-full space-y-5 bounce-in">
       <div class="flex justify-between items-center border-b pb-2">
         <span class="text-xs font-black text-blue-700 bg-blue-100 px-3 py-1 rounded-full">2단계 미션</span>
-        <span class="text-xs font-bold text-slate-500">스캔 진행: <span id="s2-step">1</span> / 4</span>
+        <span class="text-xs font-bold text-slate-500">진행: <span id="s2-step">1</span> / 4</span>
       </div>
 
       <div class="text-center space-y-1">
@@ -152,7 +191,7 @@
         <p class="text-xs text-slate-500">마크를 스캔하여 확인한 후 알맞은 분리수거통을 선택하세요.</p>
       </div>
 
-      <div class="relative bg-slate-100 rounded-3xl p-6 border-2 border-slate-300 flex flex-col items-center justify-center space-y-3">
+      <div class="relative bg-slate-50 rounded-3xl p-6 border-2 border-slate-300 flex flex-col items-center justify-center space-y-3">
         <div id="s2-item-emoji" class="text-7xl">🧴</div>
         <div id="s2-item-name" class="font-extrabold text-base text-slate-800">투명 음료 페트병</div>
 
@@ -181,7 +220,7 @@
     </div>
 
     <!-- ================= 3. [3단계: 4대 액션 챌린지] ================= -->
-    <div id="screen-stage3" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/40 space-y-5 bounce-in max-w-lg w-full">
+    <div id="screen-stage3" class="hidden bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-purple-400 max-w-lg w-full space-y-5 bounce-in">
       <div class="flex justify-between items-center border-b pb-2">
         <span class="text-xs font-black text-purple-700 bg-purple-100 px-3 py-1 rounded-full">3단계 미션</span>
         <span id="s3-step-indicator" class="text-xs font-black text-purple-600">ACTION 1 / 4</span>
@@ -208,8 +247,8 @@
       </div>
     </div>
 
-    <!-- ================= 4. [4단계: 60초 최종 보스 타임어택] ================= -->
-    <div id="screen-stage4" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/40 space-y-4 bounce-in max-w-xl w-full">
+    <!-- ================= 4. [4단계: 60초 최종 타임어택] ================= -->
+    <div id="screen-stage4" class="hidden bg-white rounded-3xl p-6 shadow-2xl border-4 border-orange-400 max-w-xl w-full space-y-4 bounce-in">
       <div class="flex justify-between items-center border-b pb-2">
         <span class="text-xs font-black text-orange-700 bg-orange-100 px-3 py-1 rounded-full">최종 보스 타임어택</span>
         <div class="flex items-center gap-1.5 text-sm font-black text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-200">
@@ -244,8 +283,8 @@
       </div>
     </div>
 
-    <!-- ================= 5. [결과 화면: 최종 인증서] ================= -->
-    <div id="screen-result" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-yellow-400 max-w-md w-full text-center space-y-6 bounce-in">
+    <!-- ================= 5. [결과 화면] ================= -->
+    <div id="screen-result" class="hidden bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-yellow-400 max-w-md w-full text-center space-y-6 bounce-in">
       <div class="text-6xl animate-bounce">🏆</div>
       <div class="space-y-1">
         <span class="bg-yellow-100 text-yellow-800 text-xs font-black px-4 py-1.5 rounded-full border border-yellow-300">MISSION COMPLETE</span>
@@ -255,18 +294,18 @@
 
       <div class="bg-slate-50 border-2 border-slate-200 rounded-3xl p-5 space-y-2">
         <div class="text-xs text-slate-400 font-bold">최종 작전 점수</div>
-        <div id="result-score" class="text-4xl font-black text-emerald-600">1,450점</div>
-        <div class="text-xs font-bold text-amber-600">🌟 완벽한 지구 수호자 등급 달성!</div>
+        <div id="result-score" class="text-4xl font-black text-amber-600">1,550점</div>
+        <div class="text-xs font-bold text-emerald-600">🌟 최고 등급 에코 마스터 달성!</div>
       </div>
 
-      <button onclick="restartGame()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base">
+      <button onclick="restartGame()" class="w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base">
         처음부터 다시 도전하기 🔄
       </button>
     </div>
 
   </main>
 
-  <footer class="p-3 text-center text-xs text-white/60 font-medium">
+  <footer class="p-3 text-center text-xs text-slate-400 font-medium">
     국립과천과학관 분리배출 카드게임 기반 에듀테크 인터랙티브 웹앱
   </footer>
 
@@ -277,7 +316,7 @@
     let playerSchool = "";
     let playerIdName = "";
 
-    // Web Audio Synthesizer 효과음
+    // Web Audio 사운드 효과
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, type, duration) {
       if (!soundEnabled) return;
@@ -309,14 +348,14 @@
     }
 
     function showScreen(id) {
-      ['screen-login', 'screen-stage1', 'screen-stage2', 'screen-stage3', 'screen-stage4', 'screen-result'].forEach(s => {
+      ['screen-login', 'screen-diff', 'screen-stage1', 'screen-stage2', 'screen-stage3', 'screen-stage4', 'screen-result'].forEach(s => {
         document.getElementById(s).classList.add('hidden');
       });
       document.getElementById(id).classList.remove('hidden');
       lucide.createIcons();
     }
 
-    // ================= 0. [로그인 확인 및 시작] =================
+    // 0. 로그인
     function handleLoginSubmit(e) {
       e.preventDefault();
       playerSchool = document.getElementById('input-school').value.trim();
@@ -324,130 +363,150 @@
 
       document.getElementById('header-user-tag').innerText = `${playerSchool} ${playerIdName}`;
       document.getElementById('game-header').classList.remove('hidden');
-      
       soundSuccess();
-      initStage1(); // 1단계 10개 숨은그림찾기로 직행!
+      showScreen('screen-diff'); // 난이도 선택 화면으로 이동
     }
 
-    // ================= 1. [1단계: 10개 숨은그림찾기 & 드래그 분리배출] =================
-    const scenes = [
-      {
-        title: "📍 장소: 어질러진 놀이동산",
-        bgHtml: `
-          <div class="absolute left-6 top-8 text-6xl opacity-30">🎡</div>
-          <div class="absolute right-8 top-12 text-5xl opacity-30">🎪</div>
-          <div class="absolute left-1/3 top-10 text-6xl opacity-20">🎢</div>
-          <div class="absolute right-1/4 bottom-6 text-7xl opacity-25">🎠</div>
-          <div class="absolute inset-0 bg-gradient-to-b from-sky-900/60 via-indigo-950/80 to-slate-900/90"></div>
-        `
-      }
+    // ================= 1. [초밀집 숨은그림찾기 엔진] =================
+    
+    // 25종의 다양한 쓰레기 풀 (이 중 랜덤 10개가 추출됨)
+    const allTrashPool = [
+      { name: "투명 페트병", emoji: "🧴", bin: "plastic" },
+      { name: "알루미늄 탄산캔", emoji: "🥫", bin: "can_glass" },
+      { name: "기름 묻은 피자박스", emoji: "🍕", bin: "trash" },
+      { name: "택배 종이상자", emoji: "📦", bin: "paper_vinyl" },
+      { name: "투명 음료 유리병", emoji: "🍾", bin: "can_glass" },
+      { name: "과자 비닐봉투", emoji: "🥨", bin: "paper_vinyl" },
+      { name: "양념 컵라면 용기", emoji: "🥡", bin: "trash" },
+      { name: "플라스틱 배달용기", emoji: "🍱", bin: "plastic" },
+      { name: "다 쓴 건전지", emoji: "🔋", bin: "trash" },
+      { name: "일회용 빨대와 종이컵", emoji: "🥤", bin: "trash" },
+      { name: "생수병 뚜껑", emoji: "🔘", bin: "plastic" },
+      { name: "통조림 캔", emoji: "🐟", bin: "can_glass" },
+      { name: "신문지 뭉치", emoji: "📰", bin: "paper_vinyl" },
+      { name: "샴푸 플라스틱 통", emoji: "🧼", bin: "plastic" },
+      { name: "깨진 유리컵 조각", emoji: "🥛", bin: "trash" }
     ];
 
-    const s1ItemsData = [
-      { id: 0, name: "투명 생수 페트병", emoji: "🧴", bin: "plastic", x: 12, y: 20 },
-      { id: 1, name: "알루미늄 탄산 캔", emoji: "🥫", bin: "can_glass", x: 82, y: 18 },
-      { id: 2, name: "기름 묻은 피자 박스", emoji: "🍕", bin: "trash", x: 45, y: 35 },
-      { id: 3, name: "택배 종이 상자", emoji: "📦", bin: "paper_vinyl", x: 20, y: 70 },
-      { id: 4, name: "투명 음료 유리병", emoji: "🍾", bin: "can_glass", x: 75, y: 65 },
-      { id: 5, name: "깨끗한 과자 비닐봉투", emoji: "🥨", bin: "paper_vinyl", x: 30, y: 15 },
-      { id: 6, name: "양념 범벅 컵라면 용기", emoji: "🥡", bin: "trash", x: 60, y: 22 },
-      { id: 7, name: "플라스틱 배달 용기", emoji: "🍱", bin: "plastic", x: 88, y: 75 },
-      { id: 8, name: "다 쓴 건전지", emoji: "🔋", bin: "trash", x: 10, y: 45 },
-      { id: 9, name: "비닐 코팅 일회용 종이컵", emoji: "🥤", bin: "trash", x: 50, y: 78 }
+    // 배경을 가득 채울 복잡한 배경 오브젝트 목록 (Hidden Folks 스타일)
+    const clutterIcons = [
+      "🌳", "🌲", "🌴", "🏡", "🎪", "🎡", "🎢", "🎠", "⛺", "⛲", 
+      "🚲", "🐕", "🐈", "🌸", "🍄", "🪑", " benches", "🏮", "🗿", "🏛️", 
+      "🏰", "🐪", "🌴", "🛶", "🎈", "🛋️", "🪴", "🪟", "🚪", "📦"
     ];
 
     let s1Remaining = 10;
-    let activePickedItem = null;
+    let s1ActiveItem = null;
+    let currentDifficulty = 'normal';
 
-    function initStage1() {
+    function startStage1(diff) {
+      currentDifficulty = diff;
       showScreen('screen-stage1');
+      soundSuccess();
+      buildDenseHiddenMap(diff);
+    }
+
+    // ⭐ [초밀집 일러스트 맵 생성 함수]
+    function buildDenseHiddenMap(diff) {
       s1Remaining = 10;
-      activePickedItem = null;
+      s1ActiveItem = null;
       document.getElementById('s1-countdown').innerText = '10';
-      document.getElementById('s1-bg-elements').innerHTML = scenes[0].bgHtml;
-      document.getElementById('s1-scene-title').innerText = scenes[0].title;
       document.getElementById('s1-item-picked-tray').classList.add('hidden');
 
-      const itemsLayer = document.getElementById('s1-items-layer');
-      itemsLayer.innerHTML = '';
+      const bgLayer = document.getElementById('map-bg-clutter');
+      const trashLayer = document.getElementById('map-trash-layer');
+      bgLayer.innerHTML = '';
+      trashLayer.innerHTML = '';
 
-      // 10개 숨은 쓰레기 아이템 맵에 배치
-      s1ItemsData.forEach(item => {
+      // 난이도별 배경 사물 개수 설정 (초급: 35개, 중급: 65개, 고급: 100개)
+      let clutterCount = (diff === 'easy') ? 35 : (diff === 'normal') ? 65 : 105;
+      let itemScale = (diff === 'easy') ? 'text-4xl' : (diff === 'normal') ? 'text-3xl' : 'text-2xl';
+
+      // 1. 수많은 배경 오브젝트 빽빽하게 깔기 (방해 요소)
+      for (let i = 0; i < clutterCount; i++) {
+        const el = document.createElement('div');
+        const icon = clutterIcons[Math.floor(Math.random() * clutterIcons.length)];
+        const left = Math.floor(Math.random() * 92) + 2;
+        const top = Math.floor(Math.random() * 88) + 4;
+        const size = Math.floor(Math.random() * 25) + 30; // 30~55px
+
+        el.className = "absolute select-none opacity-80 transition hover:opacity-100";
+        el.style.left = `${left}%`;
+        el.style.top = `${top}%`;
+        el.style.fontSize = `${size}px`;
+        el.innerText = icon;
+        bgLayer.appendChild(el);
+      }
+
+      // 2. 25종 중 무작위 10개 쓰레기 선별하여 배경 오브젝트 사이에 교묘히 은닉 배치
+      const shuffledTrash = [...allTrashPool].sort(() => 0.5 - Math.random()).slice(0, 10);
+
+      shuffledTrash.forEach((item, idx) => {
         const btn = document.createElement('button');
-        btn.id = `s1-btn-${item.id}`;
-        btn.className = "absolute text-3xl sm:text-4xl hover:scale-125 active:scale-90 transition transform p-2 cursor-pointer animate-pulse drop-shadow-lg";
-        btn.style.left = `${item.x}%`;
-        btn.style.top = `${item.y}%`;
+        const left = Math.floor(Math.random() * 90) + 4;
+        const top = Math.floor(Math.random() * 85) + 6;
+
+        btn.id = `trash-btn-${idx}`;
+        btn.className = `absolute ${itemScale} p-1 cursor-pointer transition transform hover:scale-150 active:scale-95 drop-shadow-md z-20`;
+        btn.style.left = `${left}%`;
+        btn.style.top = `${top}%`;
         btn.innerText = item.emoji;
-        btn.onclick = () => pickHiddenItem(item);
-        btn.draggable = true;
-        btn.ondragstart = (e) => {
-          pickHiddenItem(item);
-          e.dataTransfer.setData("text/plain", item.id);
+
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          pickHiddenTrash(item, idx);
         };
-        itemsLayer.appendChild(btn);
+
+        trashLayer.appendChild(btn);
       });
     }
 
-    function pickHiddenItem(item) {
-      activePickedItem = item;
+    function pickHiddenTrash(item, idx) {
+      s1ActiveItem = { ...item, idx: idx };
       soundPickup();
 
-      // 주운 아이템 안내창 띄우기
       document.getElementById('picked-emoji').innerText = item.emoji;
       document.getElementById('picked-name').innerText = item.name;
       document.getElementById('s1-item-picked-tray').classList.remove('hidden');
 
-      // 맵 상에서 반짝이게 강조
-      document.querySelectorAll('#s1-items-layer button').forEach(b => b.classList.remove('glow'));
-      const activeBtn = document.getElementById(`s1-btn-${item.id}`);
-      if (activeBtn) activeBtn.classList.add('glow');
-    }
-
-    function allowDrop(e) { e.preventDefault(); }
-    function handleDrop(e, binType) {
-      e.preventDefault();
-      handleBinDrop(binType);
+      // 선택된 아이템 강조 애니메이션
+      const btn = document.getElementById(`trash-btn-${idx}`);
+      if (btn) {
+        btn.classList.add('animate-bounce');
+      }
     }
 
     function handleBinDrop(binType) {
-      if (!activePickedItem) {
-        alert("🔍 먼저 화면 속 숨겨진 쓰레기 아이템을 터치해 선택하세요!");
+      if (!s1ActiveItem) {
+        alert("🔍 먼저 복잡한 그림 속에서 숨겨진 쓰레기를 찾아 터치하세요!");
         return;
       }
 
-      if (activePickedItem.bin === binType) {
-        // 정답!
+      if (s1ActiveItem.bin === binType) {
         soundSuccess();
         addScore(100);
-        
-        // 맵에서 아이템 제거
-        const btn = document.getElementById(`s1-btn-${activePickedItem.id}`);
+
+        // 맵에서 쓰레기 제거
+        const btn = document.getElementById(`trash-btn-${s1ActiveItem.idx}`);
         if (btn) btn.remove();
 
         document.getElementById('s1-item-picked-tray').classList.add('hidden');
-        activePickedItem = null;
+        s1ActiveItem = null;
 
-        // ⭐ 마이너스 카운팅
+        // ⭐ 마이너스 카운팅 (10 -> 0)
         s1Remaining--;
         document.getElementById('s1-countdown').innerText = s1Remaining;
 
         if (s1Remaining <= 0) {
-          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+          confetti({ particleCount: 130, spread: 80, origin: { y: 0.6 } });
           setTimeout(() => {
-            alert("🎉 [1단계 완료!] 10개의 숨은 쓰레기를 모두 분리배출했습니다!\n다음 2단계 마크 스캐너로 이동합니다.");
+            alert("🎉 [1단계 완벽 클리어!] 10개의 숨은 자원을 모두 찾아 올바르게 분리배출했습니다!\n2단계 마크 스캐너로 이동합니다.");
             initStage2();
-          }, 500);
+          }, 400);
         }
       } else {
-        // 오답
         soundFail();
-        const binEl = document.getElementById(`bin-${binType.replace('_', '-')}`);
-        if (binEl) {
-          binEl.classList.add('shake');
-          setTimeout(() => binEl.classList.remove('shake'), 400);
-        }
-        alert("❌ 잘못된 분리수거통입니다! 다시 생각해보세요.");
+        alert("❌ 잘못된 분리수거통입니다! 재활용 가능 여부를 다시 확인해보세요.");
       }
     }
 
