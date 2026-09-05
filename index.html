@@ -3,239 +3,293 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>자원순환 탐험대 : 분리배출 4원칙</title>
+  <title>자원순환 탐험대 : 올바른 분리배출</title>
   <!-- Tailwind CSS & Lucide Icons & Confetti -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-    body { font-family: 'Pretendard', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .bounce-in { animation: bounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-    @keyframes bounceIn {
-      0% { transform: scale(0.3); opacity: 0; }
-      50% { transform: scale(1.05); }
+    body { font-family: 'Pretendard', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: none; }
+    
+    /* 맑은 하늘 애니메이션 구름 */
+    .cloud-anim-1 { animation: floatCloud 25s linear infinite; }
+    .cloud-anim-2 { animation: floatCloud 35s linear infinite; }
+    @keyframes floatCloud {
+      0% { transform: translateX(-150px); }
+      100% { transform: translateX(calc(100vw + 150px)); }
+    }
+    
+    /* 물줄기 애니메이션 */
+    .water-stream {
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.8) 0%, rgba(14, 165, 233, 0.9) 100%);
+      animation: waterFlow 0.3s linear infinite;
+    }
+    @keyframes waterFlow {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+
+    .bounce-pop { animation: pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    @keyframes pop {
+      0% { transform: scale(0.6); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
-    }
-    .shake { animation: shake 0.4s ease-in-out; }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
-    }
-    .water-spray { animation: spray 0.5s ease-out; }
-    @keyframes spray {
-      0% { transform: scale(0.5); opacity: 0.8; }
-      100% { transform: scale(1.5); opacity: 0; }
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-teal-900 via-slate-900 to-emerald-950 min-h-screen text-slate-800 flex flex-col justify-between select-none overflow-hidden">
+<body class="bg-gradient-to-b from-sky-300 via-sky-200 to-emerald-200 w-screen h-screen overflow-hidden select-none flex flex-col justify-between relative">
 
-  <!-- ================= 상단 전체화면 내비게이션 바 ================= -->
-  <header id="game-header" class="hidden w-full px-4 sm:px-8 py-3 bg-white/95 backdrop-blur-md shadow-md border-b border-emerald-300 z-30 flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center text-xl shadow-md">
-        ♻️
-      </div>
-      <div>
-        <h1 class="font-black text-sm sm:text-lg text-slate-800 tracking-tight">자원순환 탐험대 : 분리배출 4원칙</h1>
-        <p id="header-user-tag" class="text-xs text-emerald-800 font-extrabold">대기 중</p>
-      </div>
-    </div>
-    
-    <!-- 실시간 4대 원칙 스텝 인디케이터 -->
-    <div id="step-breadcrumb" class="hidden sm:flex items-center gap-2 text-xs font-black">
-      <span id="step-pill-1" class="px-3 py-1 rounded-full bg-slate-100 text-slate-400">1. 비운다</span>
-      <span class="text-slate-300">➔</span>
-      <span id="step-pill-2" class="px-3 py-1 rounded-full bg-slate-100 text-slate-400">2. 헹군다</span>
-      <span class="text-slate-300">➔</span>
-      <span id="step-pill-3" class="px-3 py-1 rounded-full bg-slate-100 text-slate-400">3. 분리한다</span>
-      <span class="text-slate-300">➔</span>
-      <span id="step-pill-4" class="px-3 py-1 rounded-full bg-slate-100 text-slate-400">4. 섞지않기</span>
-    </div>
+  <!-- 배경 장식 (구름 & 언덕) -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="cloud-anim-1 absolute top-6 text-6xl opacity-70">☁️</div>
+    <div class="cloud-anim-2 absolute top-20 text-5xl opacity-60">☁️</div>
+    <div class="absolute bottom-0 w-full h-32 bg-gradient-to-t from-emerald-400 to-emerald-300/60 rounded-t-[50%] scale-x-125 opacity-70"></div>
+  </div>
 
-    <div class="flex items-center gap-3">
-      <div class="bg-emerald-50 px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 font-black text-xs sm:text-sm text-emerald-900 border border-emerald-300 shadow-inner">
-        <span>⭐ 점수:</span>
-        <span id="global-score" class="text-emerald-700 font-black text-base">0</span>
+  <!-- ================= 1. 상단 분리배출함 라인업 (영상 스타일) ================= -->
+  <header id="top-bins-bar" class="w-full px-2 sm:px-6 pt-3 pb-2 z-20">
+    <div class="max-w-5xl mx-auto flex flex-col gap-2">
+      
+      <!-- 상태 타이틀 바 -->
+      <div class="flex justify-between items-center bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-md border border-white">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🌱</span>
+          <span class="font-black text-xs sm:text-sm text-slate-800 tracking-tight">자원순환 탐험대 : 올바른 분리배출</span>
+          <span id="user-badge" class="hidden text-[11px] bg-emerald-100 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full">홍길동 대원</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- 4대 원칙 뱃지 (비·헹·분·섞) -->
+          <div class="flex items-center gap-1 text-[11px] font-black">
+            <span id="badge-empty" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-500">비</span>
+            <span id="badge-rinse" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-500">헹</span>
+            <span id="badge-separate" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-500">분</span>
+            <span id="badge-sort" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-500">섞</span>
+          </div>
+
+          <div class="bg-yellow-400 text-yellow-950 font-black px-3 py-1 rounded-xl text-xs shadow-sm flex items-center gap-1">
+            <span>⭐</span>
+            <span id="game-score">0</span>
+          </div>
+          <button onclick="toggleSound()" class="bg-slate-100 hover:bg-slate-200 p-1.5 rounded-xl text-slate-700">
+            <i data-lucide="volume-2" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
-      <button onclick="toggleSound()" id="sound-btn" class="bg-slate-100 hover:bg-slate-200 p-2 rounded-xl text-slate-700 transition border border-slate-300">
-        <i data-lucide="volume-2" class="w-4 h-4"></i>
-      </button>
+
+      <!-- 상단 컬러풀 분리수거통 7종 (드롭 타겟) -->
+      <div id="bins-container" class="grid grid-cols-7 gap-1 sm:gap-2">
+        <!-- 종이 -->
+        <div data-bintype="paper" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'paper')" onclick="clickBin('paper')" class="bin-item bg-slate-800 text-white rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-md border-2 border-slate-700 transition active:scale-95 cursor-pointer flex flex-col items-center justify-between h-16 sm:h-20">
+          <div class="text-[10px] sm:text-xs font-black bg-slate-900 w-full py-0.5 rounded">종이</div>
+          <div class="text-xl sm:text-2xl">📦</div>
+        </div>
+        <!-- 일반팩 -->
+        <div data-bintype="carton" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'carton')" onclick="clickBin('carton')" class="bin-item bg-emerald-600 text-white rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-md border-2 border-emerald-500 transition active:scale-95 cursor-pointer flex flex-col items-center justify-between h-16 sm:h-20">
+          <div class="text-[10px] sm:text-xs font-black bg-emerald-700 w-full py-0.5 rounded">일반팩</div>
+          <div class="text-xl sm:text-2xl">🧃</div>
+        </div>
+        <!-- 플라스틱 -->
+        <div data-bintype="plastic" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'plastic')" onclick="clickBin('plastic')" class="bin-item bg-blue-600 text-white rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-md border-2 border-blue-500 transition active:scale-95 cursor-pointer flex flex-col items-center justify-between h-16 sm:h-20">
+          <div class="text-[10px] sm:text-xs font-black bg-blue-700 w-full py-0.5 rounded">플라스틱</div>
+          <div class="text-xl sm:text-2xl">🧴</div>
+        </div>
+        <!-- 무색페트 -->
+        <div data-bintype="clear_pet" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'clear_pet')" onclick="clickBin('clear_pet')" class="bin-item bg-yellow-400 text-yellow-950 rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-md border-2 border-yellow-300 transition active:scale-95 cursor-pointer flex flex-col items-center justify-between h-16 sm:h-20">
+          <div class="text-[10px] sm:text-xs font-black bg-yellow-500 w-full py-0.5 rounded">무색페트</div>
+          <div class="text-xl sm:text-2xl">✨</div>
+        </div>
+        <!-- 캔류 -->
+        <div data-bintype="can" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'can')" onclick="clickBin('can')" class="bin-item bg-slate-400 text-slate-900 rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-md border-2 border-slate-300 transition active:scale-95 cursor-pointer flex flex-col items-center justify-between h-16 sm:h-20">
+          <div class="text-[10px] sm:text-xs font-black bg-slate-500 text-white w-full py-0.5 rounded">캔류</div>
+          <div class="text-xl sm:text-2xl">🥫</div>
+        </div>
+        <!-- 유리 -->
+        <div data-bintype="glass" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'glass')" onclick="clickBin('glass')" class="bin-item bg-orange-500 text-white rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-md border-2 border-orange-400 transition active:scale-95 cursor-pointer flex flex-col items-center justify-between h-16 sm:h-20">
+          <div class="text-[10px] sm:text-xs font-black bg-orange-600 w-full py-0.5 rounded">유리</div>
+          <div class="text-xl sm:text-2xl">🍾</div>
+        </div>
+        <!-- 종량제 -->
+        <div data-bintype="trash" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'trash')" onclick="clickBin('trash')" class="bin-item bg-pink-200 text-pink-950 rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-md border-2 border-pink-300 transition active:scale-95 cursor-pointer flex flex-col items-center justify-between h-16 sm:h-20">
+          <div class="text-[10px] sm:text-xs font-black bg-pink-300 w-full py-0.5 rounded">종량제</div>
+          <div class="text-xl sm:text-2xl">🗑️</div>
+        </div>
+      </div>
+
     </div>
   </header>
 
-  <!-- ================= 전체 화면 메인 뷰포트 ================= -->
-  <main class="flex-1 w-full h-full flex flex-col justify-center items-center p-2 sm:p-6 relative">
+  <!-- ================= 2. 중앙 풀스크린 실감형 인터랙션 워크숍 ================= -->
+  <main class="flex-1 w-full max-w-5xl mx-auto px-4 flex flex-col justify-center items-center relative z-10">
 
-    <!-- ================= 0. [첫 페이지: 로그인 화면] ================= -->
-    <div id="screen-login" class="bg-white/95 backdrop-blur-md rounded-3xl p-8 sm:p-12 shadow-2xl border-4 border-emerald-400 max-w-lg w-full space-y-6 bounce-in my-auto">
-      <div class="text-center space-y-2">
-        <div class="inline-block p-4 bg-emerald-100 rounded-3xl text-6xl mb-2 shadow-inner animate-bounce">🌍</div>
+    <!-- 0. [시작/로그인 화면] -->
+    <div id="view-login" class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-emerald-400 max-w-md w-full space-y-5 bounce-pop text-center">
+      <div class="text-6xl animate-bounce">🌍</div>
+      <div>
         <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">자원순환 탐험대</h2>
-        <p class="text-xs sm:text-sm text-slate-500 font-bold">비우고, 헹구고, 분리하고, 섞지 않는 분리배출 4원칙을 마스터하세요!</p>
+        <p class="text-xs sm:text-sm text-slate-500 font-bold mt-1">비우고 ➡️ 헹구고 ➡️ 분리하고 ➡️ 섞지않기!</p>
       </div>
 
-      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+      <form onsubmit="startGame(event)" class="space-y-3.5 text-left">
         <div>
-          <label class="block text-xs font-black text-slate-700 mb-1">학교 이름 <span class="text-red-500">*</span></label>
-          <input type="text" id="input-school" required placeholder="예: 서울초등학교" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3.5 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <label class="block text-xs font-black text-slate-700 mb-1">학교 이름</label>
+          <input type="text" id="in-school" required placeholder="예: 과천초등학교" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
-
         <div>
-          <label class="block text-xs font-black text-slate-700 mb-1">학번 및 이름 <span class="text-red-500">*</span></label>
-          <input type="text" id="input-id-name" required placeholder="예: 50119 홍길동 (학년/반/번호/이름)" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3.5 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <label class="block text-xs font-black text-slate-700 mb-1">학번 및 이름</label>
+          <input type="text" id="in-name" required placeholder="예: 50119 홍길동" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
-
-        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base flex items-center justify-center gap-2 mt-4">
-          <span>🚀 탐험대 출동 (확인)</span>
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base flex items-center justify-center gap-2">
+          <span>🚀 분리배출 게임 시작하기!</span>
         </button>
       </form>
     </div>
 
-    <!-- ================= 1. [전체화면 4대 원칙 인터랙티브 워크숍] ================= -->
-    <div id="screen-stage1" class="hidden w-full h-full flex flex-col justify-between max-w-5xl mx-auto py-2 space-y-3">
-      
-      <!-- 스테이지 정보 & 아이템 번호 -->
-      <div class="flex justify-between items-center bg-white/90 backdrop-blur px-5 py-2.5 rounded-2xl border border-white/60 shadow-md">
-        <div class="flex items-center gap-2">
-          <span class="bg-emerald-600 text-white font-black text-xs px-3 py-1 rounded-full">실전 미션</span>
-          <span id="item-title-badge" class="font-extrabold text-xs sm:text-sm text-slate-800">🧴 1번 과제 : 라벨 붙은 음료 페트병</span>
-        </div>
-        <div class="text-xs font-extrabold text-slate-500">
-          진행도: <span id="item-progress" class="text-emerald-600 font-black text-sm">1</span> / 4개 자원
+    <!-- 1. [실감형 4대 액션 워크숍 스테이션] -->
+    <div id="view-workshop" class="hidden w-full h-full flex flex-col justify-between items-center relative py-2">
+
+      <!-- 말풍선 안내 가이드 캐릭터 -->
+      <div class="bg-white/95 backdrop-blur border-2 border-emerald-400 px-5 py-2.5 rounded-2xl shadow-xl flex items-center gap-3 animate-bounce">
+        <span class="text-3xl">🤖</span>
+        <div>
+          <div id="guide-text" class="text-xs sm:text-sm font-black text-slate-800">
+            페트병을 180도 거꾸로 돌리고 흔들어 음료를 비워주세요!
+          </div>
+          <div id="guide-sub" class="text-[11px] font-bold text-emerald-700">
+            [1단계 : 비우기]
+          </div>
         </div>
       </div>
 
-      <!-- 메인 인터랙션 중앙 스테이션 (전체 화면 활용) -->
-      <div id="action-workspace" class="relative flex-1 w-full min-h-[360px] sm:min-h-[440px] bg-gradient-to-b from-slate-800/90 via-slate-900/95 to-slate-950/95 rounded-3xl border-4 border-emerald-400/80 shadow-2xl flex flex-col items-center justify-between p-6 overflow-hidden">
-        
-        <!-- 행동 지침 안내 바 -->
-        <div class="text-center z-10 space-y-1">
-          <h3 id="action-instruction-title" class="text-lg sm:text-2xl font-black text-yellow-300 drop-shadow">
-            1. 비운다 : 페트병을 3번 터치하여 남은 음료를 쏟아내세요!
-          </h3>
-          <p id="action-instruction-sub" class="text-xs sm:text-sm text-slate-300 font-medium">
-            터치할 때마다 잔여물이 비워집니다 ⬇️
-          </p>
+      <!-- 중앙 인터랙티브 스테이지 -->
+      <div class="relative w-full flex-1 flex flex-col items-center justify-center my-auto">
+
+        <!-- 🚿 [2단계 헹구기용 수돗물 꼭지] -->
+        <div id="faucet-box" class="hidden absolute top-0 flex flex-col items-center z-10 animate-in fade-in">
+          <div class="text-6xl">🚰</div>
+          <div class="water-stream w-6 h-40 rounded-b-full shadow-lg"></div>
+          <div class="text-2xl mt-1 animate-ping">🫧</div>
         </div>
 
-        <!-- 중앙 인터랙티브 메인 아이템 오브젝트 -->
-        <div class="relative my-auto flex flex-col items-center justify-center">
+        <!-- 🧴 [메인 인터랙티브 재활용 아이템 (페트병)] -->
+        <div id="bottle-touch-zone" class="relative cursor-pointer transition-all duration-150 flex flex-col items-center justify-center p-4">
           
-          <!-- 세척용 거품/물 스프레이 효과 레이어 -->
-          <div id="rinse-effect-overlay" class="hidden absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-            <span class="text-7xl animate-ping">🫧</span>
+          <!-- 음료 잔여물 쏟아지는 이펙트 -->
+          <div id="liquid-pour" class="hidden absolute -bottom-16 flex flex-col items-center animate-bounce">
+            <div class="w-4 h-16 bg-amber-600 rounded-full opacity-80"></div>
+            <div class="text-3xl">💦</div>
           </div>
 
-          <!-- 아이템 본체 -->
-          <div id="main-item-box" onclick="handleItemInteract()" class="relative cursor-pointer transition-all duration-200 transform hover:scale-105 active:scale-95 flex flex-col items-center justify-center p-6">
+          <!-- 페트병 그래픽 본체 -->
+          <div id="bottle-graphic" class="relative transition-transform duration-200 flex flex-col items-center">
             
-            <!-- 오염 상태 및 스티커 표시 레이어 -->
-            <div id="stain-badge" class="absolute -top-2 bg-rose-500 text-white text-[11px] font-black px-3 py-1 rounded-full border border-white shadow-lg animate-pulse">
-              음료 찌꺼기 가득 ⚠️
+            <!-- 뚜껑 -->
+            <div id="bottle-cap" class="w-10 h-6 bg-blue-600 rounded-t-lg border-2 border-slate-800 flex items-center justify-center text-[10px] text-white font-black shadow">
+              뚜껑
             </div>
+            
+            <!-- 병목 -->
+            <div class="w-12 h-6 bg-white/70 backdrop-blur border-x-2 border-slate-700"></div>
 
-            <!-- 대형 이모지 그래픽 -->
-            <div id="main-item-emoji" class="text-8xl sm:text-9xl filter drop-shadow-2xl select-none">
-              🧴
-            </div>
+            <!-- 병 몸통 & 라벨 & 오염물 -->
+            <div id="bottle-body" class="w-24 sm:w-28 h-44 sm:h-48 bg-white/70 backdrop-blur rounded-2xl border-4 border-slate-700 relative flex flex-col items-center justify-center shadow-2xl overflow-hidden">
+              
+              <!-- 오염물 (음료 액체) -->
+              <div id="liquid-fill" class="absolute bottom-0 w-full h-3/4 bg-amber-500/80 transition-all duration-500 flex items-center justify-center text-xs font-black text-amber-950">
+                음료수 잔여물
+              </div>
 
-            <!-- 상태 텍스트 -->
-            <div id="item-status-tag" class="mt-3 bg-white/20 backdrop-blur text-white text-xs font-black px-4 py-1.5 rounded-full border border-white/30 shadow">
-              터치하여 행동 실행 (<span id="action-counter">0</span> / 3)
+              <!-- 찌든 얼룩 -->
+              <div id="bottle-stain" class="hidden absolute inset-0 bg-red-500/40 flex items-center justify-center text-xs font-black text-white">
+                양념 얼룩 🧼
+              </div>
+
+              <!-- 비닐 라벨 (절취선 포함) -->
+              <div id="bottle-label" class="hidden absolute w-full h-16 bg-emerald-500 border-y-2 border-dashed border-white flex flex-col items-center justify-center text-white text-[11px] font-black shadow z-10 cursor-pointer active:scale-95">
+                <span>🏷️ 비닐 라벨</span>
+                <span class="text-[9px] text-yellow-200">점선 따라 뜯기 ✂️</span>
+              </div>
+
             </div>
           </div>
 
-          <!-- 4단계: 분리된 3개 부품 컨테이너 (4단계에서만 나타남) -->
-          <div id="separated-parts-box" class="hidden flex flex-wrap items-center justify-center gap-4 sm:gap-6 z-20 animate-in fade-in">
-            <!-- 1. 몸통 -->
-            <div id="part-body" draggable="true" ondragstart="handlePartDragStart(event, 'body')" onclick="handlePartClick('body')" class="bg-white/90 p-4 rounded-2xl border-4 border-yellow-400 text-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition transform">
-              <div id="part-body-icon" class="text-5xl">🧴</div>
-              <div id="part-body-text" class="text-xs font-black text-slate-800 mt-1">투명 페트 몸통</div>
-              <div class="text-[10px] text-yellow-700 font-bold">터치/드래그</div>
-            </div>
-
-            <!-- 2. 라벨 -->
-            <div id="part-label" draggable="true" ondragstart="handlePartDragStart(event, 'label')" onclick="handlePartClick('label')" class="bg-white/90 p-4 rounded-2xl border-4 border-emerald-400 text-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition transform">
-              <div id="part-label-icon" class="text-5xl">🏷️</div>
-              <div id="part-label-text" class="text-xs font-black text-slate-800 mt-1">비닐 라벨</div>
-              <div class="text-[10px] text-emerald-700 font-bold">터치/드래그</div>
-            </div>
-
-            <!-- 3. 뚜껑 -->
-            <div id="part-cap" draggable="true" ondragstart="handlePartDragStart(event, 'cap')" onclick="handlePartClick('cap')" class="bg-white/90 p-4 rounded-2xl border-4 border-blue-400 text-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition transform">
-              <div id="part-cap-icon" class="text-5xl">🔘</div>
-              <div id="part-cap-text" class="text-xs font-black text-slate-800 mt-1">플라스틱 뚜껑</div>
-              <div class="text-[10px] text-blue-700 font-bold">터치/드래그</div>
-            </div>
+          <!-- 터치 제스처 안내 뱃지 -->
+          <div id="gesture-prompt" class="mt-4 bg-slate-900/90 text-white font-black text-xs px-4 py-2 rounded-full border border-yellow-400 shadow-xl flex items-center gap-1.5 animate-pulse">
+            <span>🔄 페트병을 터치해서 180도 돌리세요!</span>
           </div>
 
         </div>
 
-        <!-- 4단계: 하단 4색 분리배출 수거함 (4단계에서만 활성화) -->
-        <div id="workshop-bins" class="hidden w-full grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 z-10 pt-2 animate-in fade-in">
-          
-          <div onclick="handleBinSelected('plastic')" ondragover="allowDrop(event)" ondrop="handlePartDrop(event, 'plastic')" class="bg-yellow-100 hover:bg-yellow-200 border-4 border-yellow-400 p-3 rounded-2xl text-center shadow-lg transition active:scale-95 cursor-pointer">
-            <div class="text-2xl sm:text-3xl">🟡</div>
-            <div class="text-xs font-black text-yellow-950">플라스틱 / PET</div>
-            <div class="text-[10px] text-yellow-800 font-bold">페트병 몸통 등</div>
+        <!-- 🧺 [4단계: 3조각 분리된 부품들] -->
+        <div id="separated-parts" class="hidden flex items-center justify-center gap-4 sm:gap-8 z-20 animate-in fade-in">
+          <!-- 1. 무색 페트 몸통 -->
+          <div id="part-pet" draggable="true" ondragstart="dragPart(event, 'clear_pet')" onclick="selectPart('clear_pet')" class="part-card bg-white p-3 sm:p-4 rounded-2xl border-4 border-yellow-400 text-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition">
+            <div class="text-4xl sm:text-5xl">🧴</div>
+            <div class="text-xs font-black text-slate-800 mt-1">투명 페트병</div>
+            <div class="text-[10px] text-yellow-800 font-bold">무색페트함으로!</div>
           </div>
 
-          <div onclick="handleBinSelected('can_glass')" ondragover="allowDrop(event)" ondrop="handlePartDrop(event, 'can_glass')" class="bg-blue-100 hover:bg-blue-200 border-4 border-blue-400 p-3 rounded-2xl text-center shadow-lg transition active:scale-95 cursor-pointer">
-            <div class="text-2xl sm:text-3xl">🔵</div>
-            <div class="text-xs font-black text-blue-950">캔류 / 유리병</div>
-            <div class="text-[10px] text-blue-800 font-bold">음료캔, 참치캔, 유리</div>
+          <!-- 2. 비닐 라벨 -->
+          <div id="part-label" draggable="true" ondragstart="dragPart(event, 'paper')" onclick="selectPart('paper')" class="part-card bg-white p-3 sm:p-4 rounded-2xl border-4 border-slate-700 text-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition">
+            <div class="text-4xl sm:text-5xl">🏷️</div>
+            <div class="text-xs font-black text-slate-800 mt-1">비닐 라벨</div>
+            <div class="text-[10px] text-slate-600 font-bold">비닐/종이함으로!</div>
           </div>
 
-          <div onclick="handleBinSelected('paper_vinyl')" ondragover="allowDrop(event)" ondrop="handlePartDrop(event, 'paper_vinyl')" class="bg-emerald-100 hover:bg-emerald-200 border-4 border-emerald-400 p-3 rounded-2xl text-center shadow-lg transition active:scale-95 cursor-pointer">
-            <div class="text-2xl sm:text-3xl">🟢</div>
-            <div class="text-xs font-black text-emerald-950">종이류 / 비닐류</div>
-            <div class="text-[10px] text-emerald-800 font-bold">박스, 뜯어낸 비닐라벨</div>
+          <!-- 3. 플라스틱 뚜껑 -->
+          <div id="part-cap" draggable="true" ondragstart="dragPart(event, 'plastic')" onclick="selectPart('plastic')" class="part-card bg-white p-3 sm:p-4 rounded-2xl border-4 border-blue-500 text-center shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition">
+            <div class="text-4xl sm:text-5xl">🔘</div>
+            <div class="text-xs font-black text-slate-800 mt-1">플라스틱 뚜껑</div>
+            <div class="text-[10px] text-blue-800 font-bold">플라스틱함으로!</div>
           </div>
-
-          <div onclick="handleBinSelected('cap_special')" ondragover="allowDrop(event)" ondrop="handlePartDrop(event, 'cap_special')" class="bg-purple-100 hover:bg-purple-200 border-4 border-purple-400 p-3 rounded-2xl text-center shadow-lg transition active:scale-95 cursor-pointer">
-            <div class="text-2xl sm:text-3xl">🟣</div>
-            <div class="text-xs font-black text-purple-950">뚜껑 / 따로모음</div>
-            <div class="text-[10px] text-purple-800 font-bold">작은 플라스틱 뚜껑</div>
-          </div>
-
         </div>
 
       </div>
+
+      <!-- 하단 다음 과제 / 힌트 바 -->
+      <div class="w-full text-center pb-2">
+        <div id="bottom-feedback" class="text-xs font-extrabold text-slate-700 bg-white/80 backdrop-blur px-4 py-1.5 rounded-full inline-block shadow">
+          💡 페트병을 손가락으로 눌러 돌리거나 흔들어보세요!
+        </div>
+      </div>
+
     </div>
 
-    <!-- ================= 2. [결과 화면: 인증서] ================= -->
-    <div id="screen-result" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-8 sm:p-12 shadow-2xl border-4 border-yellow-400 max-w-lg w-full text-center space-y-6 bounce-in my-auto">
-      <div class="text-7xl animate-bounce">🏆</div>
-      <div class="space-y-1">
-        <span class="bg-yellow-100 text-yellow-800 text-xs font-black px-4 py-1.5 rounded-full border border-yellow-300">EXPLORER CERTIFICATE</span>
-        <h2 class="text-2xl sm:text-3xl font-black text-slate-800">분리배출 4원칙 마스터!</h2>
-        <p id="result-user" class="text-xs sm:text-sm text-slate-500 font-bold">서울초 50119 홍길동 대원</p>
+    <!-- 2. [미션 성공 결과 화면] -->
+    <div id="view-result" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-8 sm:p-12 shadow-2xl border-4 border-yellow-400 max-w-md w-full text-center space-y-5 bounce-pop my-auto">
+      <div class="text-6xl animate-bounce">🏆</div>
+      <div>
+        <span class="bg-yellow-100 text-yellow-900 text-xs font-black px-4 py-1.5 rounded-full border border-yellow-300">올바른 분리배출 완료</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mt-2">분리배출 4원칙 마스터!</h2>
+        <p id="res-user-name" class="text-xs text-slate-500 font-bold mt-1">과천초 50119 홍길동 대원</p>
       </div>
 
-      <div class="bg-slate-50 border-2 border-slate-200 rounded-3xl p-5 space-y-2">
-        <div class="text-xs text-slate-400 font-bold">최종 실천 점수</div>
-        <div id="result-score" class="text-4xl sm:text-5xl font-black text-emerald-600">1,600점</div>
-        <div class="text-xs font-bold text-amber-600">🌟 비우고·헹구고·분리하고·섞지않는 완벽한 자원순환 실천가!</div>
+      <div class="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-4 space-y-1">
+        <div class="text-xs text-slate-500 font-bold">환경 기여 점수</div>
+        <div id="res-final-score" class="text-4xl font-black text-emerald-600">1,500점</div>
+        <div class="text-xs font-black text-emerald-700">🌟 비우고 헹구고 분리해서 섞지않기 성공!</div>
       </div>
 
-      <button onclick="restartGame()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base">
-        처음부터 다시 실천하기 🔄
+      <button onclick="restartGame()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base">
+        다른 자원도 분리배출해보기 🔄
       </button>
     </div>
 
   </main>
 
-  <!-- ================= JavaScript 게임 엔진 ================= -->
+  <!-- ================= 3. JavaScript 실감형 터치 엔진 ================= -->
   <script>
     let soundEnabled = true;
-    let totalScore = 0;
-    let playerSchool = "";
-    let playerIdName = "";
+    let score = 0;
+    let currentStep = 1; // 1: 비우기, 2: 헹구기, 3: 분리하기, 4: 섞지않기
+    let bottleRotation = 0;
+    let shakeCount = 0;
+    let rinseProgress = 0;
+    let selectedPart = null;
+    let partsRemaining = 3;
 
-    // Web Audio 사운드 합성기
+    // Web Audio 효과음
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, type, duration) {
       if (!soundEnabled) return;
@@ -251,317 +305,265 @@
         osc.stop(audioCtx.currentTime + duration);
       } catch(e){}
     }
-    function soundTap() { playTone(440, 'sine', 0.1); }
-    function soundRinse() { playTone(600, 'triangle', 0.15); setTimeout(()=>playTone(800, 'triangle', 0.15), 60); }
-    function soundRip() { playTone(300, 'sawtooth', 0.2); }
-    function soundSuccess() { playTone(587, 'triangle', 0.1); setTimeout(()=>playTone(880, 'triangle', 0.25), 100); }
-    function soundFail() { playTone(180, 'sawtooth', 0.3); }
+    function sndGlug() { playTone(250, 'sine', 0.12); setTimeout(()=>playTone(200, 'sine', 0.15), 80); }
+    function sndSplash() { playTone(600, 'triangle', 0.1); setTimeout(()=>playTone(850, 'sine', 0.2), 60); }
+    function sndRip() { playTone(350, 'sawtooth', 0.18); }
+    function sndDrop() { playTone(523, 'sine', 0.1); setTimeout(()=>playTone(784, 'triangle', 0.2), 80); }
+    function sndWin() { playTone(587, 'triangle', 0.1); setTimeout(()=>playTone(880, 'triangle', 0.3), 120); }
+    function sndError() { playTone(180, 'sawtooth', 0.25); }
 
     function toggleSound() {
       soundEnabled = !soundEnabled;
-      document.getElementById('sound-btn').innerHTML = soundEnabled ? '<i data-lucide="volume-2" class="w-4 h-4"></i>' : '<i data-lucide="volume-x" class="w-4 h-4"></i>';
-      lucide.createIcons();
     }
 
     function addScore(pts) {
-      totalScore += pts;
-      document.getElementById('global-score').innerText = totalScore;
+      score += pts;
+      document.getElementById('game-score').innerText = score;
     }
 
-    function showScreen(id) {
-      ['screen-login', 'screen-stage1', 'screen-result'].forEach(s => {
-        document.getElementById(s).classList.add('hidden');
-      });
-      document.getElementById(id).classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    // ================= 0. 로그인 =================
-    function handleLoginSubmit(e) {
+    // 게임 시작
+    function startGame(e) {
       e.preventDefault();
-      playerSchool = document.getElementById('input-school').value.trim();
-      playerIdName = document.getElementById('input-id-name').value.trim();
+      const school = document.getElementById('in-school').value.trim();
+      const name = document.getElementById('in-name').value.trim();
 
-      document.getElementById('header-user-tag').innerText = `${playerSchool} ${playerIdName}`;
-      document.getElementById('game-header').classList.remove('hidden');
-      soundSuccess();
-      init4PrinciplesGame();
-    }
+      document.getElementById('user-badge').innerText = `${school} ${name}`;
+      document.getElementById('user-badge').classList.remove('hidden');
 
-    // ================= ⭐ [분리배출 4원칙 실전 게임 엔진] =================
-    
-    // 4가지 대표 재활용 자원 코스
-    const itemsCourse = [
-      {
-        id: 1,
-        title: "🧴 1번 과제 : 라벨과 뚜껑이 있는 음료 페트병",
-        emptyIcon: "🥤",
-        emptyName: "음료수 찌꺼기가 남은 페트병",
-        rinseIcon: "🧴",
-        rinseName: "물로 깨끗하게 헹구기",
-        separateIcon: "🏷️",
-        separateName: "비닐 라벨 뜯기 & 뚜껑 분리",
-        parts: [
-          { type: "body", name: "투명 페트 몸통", icon: "🧴", bin: "plastic" },
-          { type: "label", name: "비닐 라벨", icon: "🏷️", bin: "paper_vinyl" },
-          { type: "cap", name: "플라스틱 뚜껑", icon: "🔘", bin: "cap_special" }
-        ]
-      },
-      {
-        id: 2,
-        title: "📦 2번 과제 : 테이프와 송장이 붙은 택배 박스",
-        emptyIcon: "📦",
-        emptyName: "박스 속 비닐/완충재 비우기",
-        rinseIcon: "📦",
-        rinseName: "오염물질 털어내기",
-        separateIcon: "✂️",
-        separateName: "비닐 테이프 & 운송장 스티커 떼기",
-        parts: [
-          { type: "body", name: "깨끗한 종이 박스", icon: "📦", bin: "paper_vinyl" },
-          { type: "label", name: "뜯어낸 비닐 테이프", icon: "🎗️", bin: "paper_vinyl" },
-          { type: "cap", name: "스티커 송장", icon: "🧾", bin: "cap_special" }
-        ]
-      },
-      {
-        id: 3,
-        title: "🥫 3번 과제 : 기름기가 남은 참치 통조림 캔",
-        emptyIcon: "🐟",
-        emptyName: "참치 기름과 국물 비우기",
-        rinseIcon: "🥫",
-        rinseName: "세제로 기름기 깨끗이 헹구기",
-        separateIcon: "🥫",
-        separateName: "캔 뚜껑 조심해서 분리하기",
-        parts: [
-          { type: "body", name: "깨끗한 캔 몸체", icon: "🥫", bin: "can_glass" },
-          { type: "label", name: "캔 뚜껑", icon: "🔘", bin: "can_glass" },
-          { type: "cap", name: "종이 띠지", icon: "🏷️", bin: "paper_vinyl" }
-        ]
-      },
-      {
-        id: 4,
-        title: "🥡 4번 과제 : 빨간 국물이 묻은 배달 플라스틱 용기",
-        emptyIcon: "🍱",
-        emptyName: "남은 음식물 완벽하게 비우기",
-        rinseIcon: "🥣",
-        rinseName: "빨간 기름기 뽀득뽀득 헹구기",
-        separateIcon: "🥢",
-        separateName: "비닐 랩 포장 완벽 분리하기",
-        parts: [
-          { type: "body", name: "씻어낸 플라스틱 용기", icon: "🥡", bin: "plastic" },
-          { type: "label", name: "포장 실링 비닐", icon: "🏷️", bin: "paper_vinyl" },
-          { type: "cap", name: "일회용 수저", icon: "🥢", bin: "plastic" }
-        ]
-      }
-    ];
-
-    let currentItemIdx = 0;
-    let currentStep = 1; // 1: 비운다, 2: 헹군다, 3: 분리한다, 4: 섞지않기
-    let stepInteractCount = 0;
-    let activeDraggedPart = null;
-    let remainingPartsCount = 3;
-
-    function init4PrinciplesGame() {
-      currentItemIdx = 0;
-      showScreen('screen-stage1');
-      loadCourseItem(0);
-    }
-
-    function loadCourseItem(idx) {
-      currentItemIdx = idx;
-      currentStep = 1;
-      stepInteractCount = 0;
-      remainingPartsCount = 3;
-
-      document.getElementById('item-progress').innerText = idx + 1;
-      document.getElementById('item-title-badge').innerText = itemsCourse[idx].title;
+      document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('view-workshop').classList.remove('hidden');
       
-      updateStepUI();
+      sndWin();
+      initStep1Empty();
     }
 
-    function updateStepUI() {
-      const item = itemsCourse[currentItemIdx];
-      const titleEl = document.getElementById('action-instruction-title');
-      const subEl = document.getElementById('action-instruction-sub');
-      const stainEl = document.getElementById('stain-badge');
-      const emojiEl = document.getElementById('main-item-emoji');
-      const statusTagEl = document.getElementById('item-status-tag');
-      const partsBox = document.getElementById('separated-parts-box');
-      const mainBox = document.getElementById('main-item-box');
-      const binsBox = document.getElementById('workshop-bins');
+    // ================= [1단계: 비우기 - 돌려서 흔들기] =================
+    function initStep1Empty() {
+      currentStep = 1;
+      bottleRotation = 0;
+      shakeCount = 0;
+      updateStepBadges();
 
-      // 상단 브레드크럼 색상 갱신
-      for (let i = 1; i <= 4; i++) {
-        const pill = document.getElementById(`step-pill-${i}`);
-        if (i === currentStep) {
-          pill.className = "px-3 py-1 rounded-full bg-emerald-500 text-white shadow font-black animate-pulse";
-        } else if (i < currentStep) {
-          pill.className = "px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold";
-        } else {
-          pill.className = "px-3 py-1 rounded-full bg-slate-100 text-slate-400";
+      document.getElementById('guide-text').innerText = "페트병을 180도 거꾸로 돌리고 위아래로 흔들어 음료를 비우세요!";
+      document.getElementById('guide-sub').innerText = "[1단계 : 비우기]";
+      document.getElementById('gesture-prompt').innerText = "🔄 페트병을 터치하여 180도 거꾸로 돌리세요!";
+      
+      const bottle = document.getElementById('bottle-graphic');
+      bottle.style.transform = "rotate(0deg)";
+      document.getElementById('liquid-fill').style.height = "75%";
+      document.getElementById('liquid-pour').classList.add('hidden');
+      document.getElementById('faucet-box').classList.add('hidden');
+
+      // 터치/클릭으로 회전 및 쏟기 인터랙션
+      const zone = document.getElementById('bottle-touch-zone');
+      zone.onclick = handleRotateAndPour;
+    }
+
+    function handleRotateAndPour() {
+      if (currentStep !== 1) return;
+
+      if (bottleRotation === 0) {
+        // 180도 거꾸로 회전!
+        bottleRotation = 180;
+        document.getElementById('bottle-graphic').style.transform = "rotate(180deg)";
+        document.getElementById('gesture-prompt').innerText = "💦 위아래로 흔들어(터치) 음료를 쏟아내세요!";
+        sndGlug();
+      } else {
+        // 흔들어서 쏟아내기
+        shakeCount++;
+        sndGlug();
+        document.getElementById('liquid-pour').classList.remove('hidden');
+        
+        // 병 흔들림
+        const bottle = document.getElementById('bottle-graphic');
+        bottle.style.transform = `rotate(${180 + (shakeCount % 2 === 0 ? 15 : -15)}deg)`;
+
+        // 음료 빠짐
+        const remain = Math.max(0, 75 - shakeCount * 25);
+        document.getElementById('liquid-fill').style.height = `${remain}%`;
+
+        if (shakeCount >= 3) {
+          // 비우기 완료!
+          document.getElementById('liquid-pour').classList.add('hidden');
+          document.getElementById('bottle-touch-zone').onclick = null;
+          addScore(100);
+          sndWin();
+          setTimeout(() => {
+            alert("✨ [1단계 비우기 완료!] 음료를 깨끗하게 비웠습니다.\n이제 수돗물에 깨끗이 헹궈볼까요?");
+            initStep2Rinse();
+          }, 300);
         }
       }
-
-      // 스텝별 화면 구성
-      if (currentStep === 1) {
-        // 1. 비운다
-        mainBox.classList.remove('hidden');
-        partsBox.classList.add('hidden');
-        binsBox.classList.add('hidden');
-
-        titleEl.innerText = "1. 비운다 ⬇️ : 내용물을 깨끗이 비워주세요!";
-        subEl.innerText = "용기를 3번 터치하여 남은 잔여물을 탈탈 쏟아내세요.";
-        stainEl.innerText = "내용물 잔여물 가득 ⚠️";
-        stainEl.className = "absolute -top-2 bg-rose-500 text-white text-[11px] font-black px-3 py-1 rounded-full border border-white shadow-lg animate-pulse";
-        emojiEl.innerText = item.emptyIcon;
-        statusTagEl.innerHTML = `터치하여 비우기 (<span id="action-counter">${stepInteractCount}</span> / 3)`;
-      } 
-      else if (currentStep === 2) {
-        // 2. 헹군다
-        titleEl.innerText = "2. 헹군다 🚿 : 물로 찌꺼기와 양념을 씻어내세요!";
-        subEl.innerText = "용기를 3번 터치해 물로 뽀득뽀득 헹궈주세요.";
-        stainEl.innerText = "양념 및 얼룩 묻음 🧼";
-        stainEl.className = "absolute -top-2 bg-amber-500 text-white text-[11px] font-black px-3 py-1 rounded-full border border-white shadow-lg animate-pulse";
-        emojiEl.innerText = item.rinseIcon;
-        statusTagEl.innerHTML = `터치하여 헹구기 (<span id="action-counter">${stepInteractCount}</span> / 3)`;
-      } 
-      else if (currentStep === 3) {
-        // 3. 분리한다
-        titleEl.innerText = "3. 분리한다 ✂️ : 라벨, 뚜껑, 테이프를 떼어내세요!";
-        subEl.innerText = "용기를 3번 터치하여 부품을 완전히 분리하세요.";
-        stainEl.innerText = "이종 재질 부착 상태 🏷️";
-        stainEl.className = "absolute -top-2 bg-blue-500 text-white text-[11px] font-black px-3 py-1 rounded-full border border-white shadow-lg animate-pulse";
-        emojiEl.innerText = item.separateIcon;
-        statusTagEl.innerHTML = `터치하여 분리하기 (<span id="action-counter">${stepInteractCount}</span> / 3)`;
-      } 
-      else if (currentStep === 4) {
-        // 4. 섞지 않는다 (부품별 개별 분리수거)
-        mainBox.classList.add('hidden');
-        partsBox.classList.remove('hidden');
-        binsBox.classList.remove('hidden');
-
-        titleEl.innerText = "4. 섞지 않는다 🧺 : 종류별로 바구니에 나누어 담기!";
-        subEl.innerText = "분리된 3개 부품을 터치/드래그하여 알맞은 분리배출함에 넣으세요.";
-
-        // 부품 카드 세팅
-        const parts = item.parts;
-        document.getElementById('part-body-icon').innerText = parts[0].icon;
-        document.getElementById('part-body-text').innerText = parts[0].name;
-        document.getElementById('part-body').style.display = 'block';
-
-        document.getElementById('part-label-icon').innerText = parts[1].icon;
-        document.getElementById('part-label-text').innerText = parts[1].name;
-        document.getElementById('part-label').style.display = 'block';
-
-        document.getElementById('part-cap-icon').innerText = parts[2].icon;
-        document.getElementById('part-cap-text').innerText = parts[2].name;
-        document.getElementById('part-cap').style.display = 'block';
-      }
     }
 
-    // 아이템 터치 인터랙션 (1~3단계)
-    function handleItemInteract() {
-      if (currentStep >= 4) return;
+    // ================= [2단계: 헹구기 - 흐르는 물에 씻기] =================
+    function initStep2Rinse() {
+      currentStep = 2;
+      rinseProgress = 0;
+      updateStepBadges();
 
-      stepInteractCount++;
-      soundTap();
+      // 페트병 바로 세우고 얼룩 생성
+      const bottle = document.getElementById('bottle-graphic');
+      bottle.style.transform = "rotate(0deg)";
+      document.getElementById('bottle-stain').classList.remove('hidden');
+      document.getElementById('faucet-box').classList.remove('hidden'); // 수도꼭지 등장
 
-      // 시각적 효과
-      const box = document.getElementById('main-item-box');
-      box.classList.add('scale-95');
-      setTimeout(()=>box.classList.remove('scale-95'), 100);
+      document.getElementById('guide-text').innerText = "흐르는 수돗물 아래로 페트병을 문질러 헹궈주세요!";
+      document.getElementById('guide-sub').innerText = "[2단계 : 헹구기]";
+      document.getElementById('gesture-prompt').innerText = "🚿 페트병을 터치/문질러 깨끗이 세척하세요!";
 
-      document.getElementById('action-counter').innerText = stepInteractCount;
+      const zone = document.getElementById('bottle-touch-zone');
+      zone.onclick = handleRinseScrub;
+    }
 
-      if (currentStep === 2) {
-        // 헹구기 거품 애니메이션
-        const rinseOverlay = document.getElementById('rinse-effect-overlay');
-        rinseOverlay.classList.remove('hidden');
-        setTimeout(()=>rinseOverlay.classList.add('hidden'), 300);
-        soundRinse();
-      } else if (currentStep === 3) {
-        soundRip();
-      }
+    function handleRinseScrub() {
+      if (currentStep !== 2) return;
 
-      if (stepInteractCount >= 3) {
-        soundSuccess();
+      rinseProgress++;
+      sndSplash();
+
+      // 거품 효과 및 얼룩 지우기
+      const stain = document.getElementById('bottle-stain');
+      stain.style.opacity = `${1 - rinseProgress * 0.35}`;
+
+      if (rinseProgress >= 3) {
+        stain.classList.add('hidden');
+        document.getElementById('faucet-box').classList.add('hidden');
+        document.getElementById('bottle-touch-zone').onclick = null;
         addScore(100);
-        stepInteractCount = 0;
-        currentStep++;
-        
-        // 다음 스텝으로 전환
-        setTimeout(updateStepUI, 300);
+        sndWin();
+        setTimeout(() => {
+          alert("✨ [2단계 헹구기 완료!] 찌꺼기를 물로 깨끗하게 씻어냈습니다.\n이제 비닐 라벨과 뚜껑을 분리해볼까요?");
+          initStep3Separate();
+        }, 300);
       }
     }
 
-    // ================= 4단계: 섞지않기 드래그 & 터치 분류 =================
-    function handlePartDragStart(e, partType) {
-      activeDraggedPart = partType;
-      e.dataTransfer.setData("text/plain", partType);
+    // ================= [3단계: 분리하기 - 라벨 뜯기] =================
+    function initStep3Separate() {
+      currentStep = 3;
+      updateStepBadges();
+
+      document.getElementById('bottle-label').classList.remove('hidden'); // 라벨 부착
+      document.getElementById('guide-text').innerText = "점선 라벨을 아래로 당겨 뜯고, 뚜껑을 분리하세요!";
+      document.getElementById('guide-sub').innerText = "[3단계 : 분리하기]";
+      document.getElementById('gesture-prompt').innerText = "✂️ 라벨을 터치하여 찌익 뜯어내세요!";
+
+      const label = document.getElementById('bottle-label');
+      label.onclick = handlePeelLabel;
     }
 
-    function handlePartClick(partType) {
-      activeDraggedPart = partType;
-      soundTap();
-      // 선택 강조 효과
-      ['body', 'label', 'cap'].forEach(p => {
-        document.getElementById(`part-${p}`).classList.remove('ring-4', 'ring-yellow-400');
-      });
-      document.getElementById(`part-${partType}`).classList.add('ring-4', 'ring-yellow-400');
+    function handlePeelLabel() {
+      if (currentStep !== 3) return;
+
+      sndRip();
+      document.getElementById('bottle-label').classList.add('hidden');
+      document.getElementById('bottle-cap').classList.add('hidden');
+      addScore(100);
+      sndWin();
+
+      setTimeout(() => {
+        alert("✨ [3단계 분리하기 완료!] 비닐 라벨과 뚜껑이 깔끔하게 분리되었습니다.\n마지막으로 상단 분리수거함에 나누어 담아볼까요?");
+        initStep4Sort();
+      }, 300);
+    }
+
+    // ================= [4단계: 섞지않기 - 상단 분리수거통에 배출] =================
+    function initStep4Sort() {
+      currentStep = 4;
+      partsRemaining = 3;
+      selectedPart = null;
+      updateStepBadges();
+
+      document.getElementById('bottle-touch-zone').classList.add('hidden');
+      document.getElementById('separated-parts').classList.remove('hidden');
+
+      document.getElementById('guide-text').innerText = "분리된 3가지 부품을 상단 알맞은 분리수거통에 넣으세요!";
+      document.getElementById('guide-sub').innerText = "[4단계 : 섞지 않는다]";
+      document.getElementById('bottom-feedback').innerText = "👆 아래 부품을 누른 뒤 상단 분리수거통을 클릭하세요!";
+    }
+
+    function dragPart(e, binType) {
+      e.dataTransfer.setData("text/plain", binType);
+      selectedPart = binType;
+    }
+
+    function selectPart(binType) {
+      selectedPart = binType;
+      sndDrop();
+      document.querySelectorAll('.part-card').forEach(p => p.classList.remove('ring-4', 'ring-yellow-400'));
+      
+      const idMap = { 'clear_pet': 'part-pet', 'paper': 'part-label', 'plastic': 'part-cap' };
+      document.getElementById(idMap[binType]).classList.add('ring-4', 'ring-yellow-400');
     }
 
     function allowDrop(e) { e.preventDefault(); }
-    function handlePartDrop(e, binType) {
+    function handleDrop(e, binType) {
       e.preventDefault();
-      handleBinSelected(binType);
+      checkDropMatch(binType);
     }
 
-    function handleBinSelected(binType) {
-      if (!activeDraggedPart) {
-        alert("👆 먼저 분리된 부품(몸통, 라벨, 뚜껑) 중 하나를 선택하세요!");
+    function clickBin(binType) {
+      if (!selectedPart) {
+        alert("👆 먼저 아래 3가지 부품(투명 페트병, 비닐 라벨, 뚜껑) 중 하나를 선택하세요!");
         return;
       }
+      checkDropMatch(binType);
+    }
 
-      const item = itemsCourse[currentItemIdx];
-      const partObj = item.parts.find(p => p.type === activeDraggedPart);
-
-      if (partObj.bin === binType) {
-        soundSuccess();
+    function checkDropMatch(targetBin) {
+      if (selectedPart === targetBin) {
+        // 정답!
+        sndDrop();
         addScore(100);
 
-        // 정답 부품 숨기기
-        document.getElementById(`part-${activeDraggedPart}`).style.display = 'none';
-        activeDraggedPart = null;
-        remainingPartsCount--;
+        const idMap = { 'clear_pet': 'part-pet', 'paper': 'part-label', 'plastic': 'part-cap' };
+        document.getElementById(idMap[selectedPart]).style.display = 'none';
+        selectedPart = null;
+        partsRemaining--;
 
-        if (remainingPartsCount <= 0) {
-          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-          setTimeout(() => {
-            if (currentItemIdx + 1 < itemsCourse.length) {
-              alert(`🎉 [${currentItemIdx + 1}번 과제 완료!] 완벽하게 4대 원칙을 실천했습니다.\n다음 재활용 자원으로 넘어갑니다!`);
-              loadCourseItem(currentItemIdx + 1);
-            } else {
-              finishGame();
-            }
-          }, 400);
+        if (partsRemaining <= 0) {
+          confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+          sndWin();
+          setTimeout(finishGame, 400);
         }
       } else {
-        soundFail();
-        alert("❌ 올바른 분리배출함이 아닙니다! 재질을 다시 확인하세요.");
+        sndError();
+        alert("❌ 다른 분리수거통입니다! 재질을 다시 확인하고 넣어주세요.");
       }
     }
 
-    // ================= 결과 화면 =================
+    function updateStepBadges() {
+      const bEmpty = document.getElementById('badge-empty');
+      const bRinse = document.getElementById('badge-rinse');
+      const bSep = document.getElementById('badge-separate');
+      const bSort = document.getElementById('badge-sort');
+
+      [bEmpty, bRinse, bSep, bSort].forEach(b => b.className = "px-2 py-0.5 rounded-full bg-slate-200 text-slate-500");
+
+      if (currentStep >= 1) bEmpty.className = "px-2 py-0.5 rounded-full bg-yellow-400 text-yellow-950 font-black";
+      if (currentStep >= 2) bRinse.className = "px-2 py-0.5 rounded-full bg-blue-500 text-white font-black";
+      if (currentStep >= 3) bSep.className = "px-2 py-0.5 rounded-full bg-emerald-500 text-white font-black";
+      if (currentStep >= 4) bSort.className = "px-2 py-0.5 rounded-full bg-purple-500 text-white font-black";
+    }
+
     function finishGame() {
-      confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
-      showScreen('screen-result');
-      document.getElementById('result-user').innerText = `${playerSchool} ${playerIdName} 대원`;
-      document.getElementById('result-score').innerText = `${totalScore}점`;
+      document.getElementById('view-workshop').classList.add('hidden');
+      document.getElementById('view-result').classList.remove('hidden');
+      document.getElementById('res-user-name').innerText = document.getElementById('user-badge').innerText;
+      document.getElementById('res-final-score').innerText = `${score}점`;
     }
 
     function restartGame() {
-      totalScore = 0;
-      document.getElementById('global-score').innerText = '0';
-      showScreen('screen-login');
+      score = 0;
+      document.getElementById('game-score').innerText = '0';
+      document.getElementById('view-result').classList.add('hidden');
+      document.getElementById('view-login').classList.remove('hidden');
+      document.getElementById('part-pet').style.display = 'block';
+      document.getElementById('part-label').style.display = 'block';
+      document.getElementById('part-cap').style.display = 'block';
+      document.getElementById('bottle-touch-zone').classList.remove('hidden');
+      document.getElementById('separated-parts').classList.add('hidden');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
