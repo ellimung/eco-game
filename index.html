@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>에코 에이전트 : 분리배출 마스터</title>
+  <title>에코 에이전트 : 지구를 청소하라!</title>
   <!-- Tailwind CSS & Lucide Icons & Confetti -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,331 +11,275 @@
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     body { font-family: 'Pretendard', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .bounce-in { animation: bounceIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
     @keyframes bounceIn {
       0% { transform: scale(0.3); opacity: 0; }
       50% { transform: scale(1.05); }
-      70% { transform: scale(0.9); }
       100% { transform: scale(1); opacity: 1; }
     }
-    .shake-anim { animation: shake 0.5s ease-in-out; }
+    .shake { animation: shake 0.4s ease-in-out; }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
     }
+    .glow { filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.9)); }
   </style>
 </head>
-<body class="bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 min-h-screen text-slate-800 flex flex-col justify-between select-none overflow-x-hidden">
+<body class="bg-gradient-to-br from-indigo-900 via-slate-900 to-emerald-950 min-h-screen text-slate-800 flex flex-col justify-between select-none overflow-x-hidden">
 
-  <!-- ================= 상단 게임 내비게이션 바 ================= -->
-  <header class="p-4 max-w-4xl w-full mx-auto flex justify-between items-center text-white">
+  <!-- ================= 상단 게임 상태 바 ================= -->
+  <header id="game-header" class="hidden p-3 sm:p-4 max-w-5xl w-full mx-auto flex justify-between items-center text-white">
     <div class="flex items-center gap-2">
-      <span class="bg-white/20 backdrop-blur p-2 rounded-xl text-xl">🌍</span>
+      <span class="bg-emerald-500/30 border border-emerald-400/40 p-2 rounded-xl text-xl shadow-lg">🌍</span>
       <div>
-        <h1 class="font-extrabold text-base sm:text-lg tracking-tight">에코 에이전트 : 분리배출 마스터</h1>
-        <p id="header-user-info" class="text-xs text-emerald-100 font-medium">대기 중</p>
+        <h1 class="font-black text-sm sm:text-base tracking-tight text-emerald-300">에코 에이전트</h1>
+        <p id="header-user-tag" class="text-[11px] text-slate-300 font-bold">대기 중</p>
       </div>
     </div>
-    <div class="flex items-center gap-3">
-      <div class="bg-white/20 backdrop-blur px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-black text-sm">
+    
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div class="bg-white/10 backdrop-blur border border-white/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5 font-black text-xs sm:text-sm">
         <span>⭐ 점수:</span>
-        <span id="global-score" class="text-yellow-300">0</span>
+        <span id="global-score" class="text-yellow-400 font-black">0</span>
       </div>
-      <button onclick="toggleSound()" id="sound-btn" class="bg-white/20 hover:bg-white/30 p-2 rounded-xl text-white transition">
-        <i data-lucide="volume-2" class="w-5 h-5"></i>
+      <button onclick="toggleSound()" id="sound-btn" class="bg-white/10 hover:bg-white/20 p-2 rounded-xl text-white transition">
+        <i data-lucide="volume-2" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
 
   <!-- ================= 메인 게임 컨테이너 ================= -->
-  <main class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col justify-center">
+  <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-center items-center">
 
-    <!-- 0. [로비 화면: 닉네임 입력 & 단계 선택] -->
-    <div id="screen-lobby" class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/40 space-y-6 bounce-in">
+    <!-- ================= 0. [첫 페이지: 로그인 및 출동 준비] ================= -->
+    <div id="screen-login" class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-2 border-emerald-400/50 max-w-md w-full space-y-6 bounce-in">
       <div class="text-center space-y-2">
-        <div class="inline-block p-3 bg-emerald-100 rounded-2xl text-4xl mb-1 shadow-inner">♻️</div>
-        <h2 class="text-2xl sm:text-3xl font-black text-slate-800">지구를 구하는 에코 특수요원</h2>
-        <p class="text-xs sm:text-sm text-slate-500">올바른 분리배출 미션을 완료하고 최고의 에코 마스터가 되어보세요!</p>
+        <div class="inline-block p-4 bg-emerald-100 rounded-3xl text-5xl mb-1 shadow-inner animate-bounce">♻️</div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">에코 에이전트 : 지구 청소 작전</h2>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium">어질러진 장소에서 쓰레기를 찾아 올바르게 분리배출하세요!</p>
       </div>
 
-      <div class="max-w-md mx-auto space-y-3">
-        <div class="grid grid-cols-2 gap-2">
-          <input type="text" id="player-school" placeholder="학교 이름 (예: 서울초)" class="border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-          <input type="text" id="player-name" placeholder="학년/반/이름 (예: 5-2 홍길동)" class="border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-        </div>
-      </div>
-
-      <!-- 단계 선택 그리드 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
-        <!-- 1단계: 저학년 vs 고학년 선택 -->
-        <div class="bg-emerald-50 p-4 rounded-2xl border-2 border-emerald-200 space-y-2 sm:col-span-2">
-          <div class="text-xs font-black text-emerald-800 flex items-center justify-between">
-            <span>[1단계] 분리배출 자원 찾기 (모드 선택)</span>
-            <span class="bg-emerald-200 px-2 py-0.5 rounded-full text-[10px]">난이도 선택</span>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="startGame('stage1_low')" class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold text-xs shadow-md transition flex flex-col items-center">
-              <span>🐣 저학년 모드</span>
-              <span class="text-[10px] text-emerald-200 font-normal">스피드 스와이프 분류</span>
-            </button>
-            <button onclick="startGame('stage1_high')" class="bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl font-bold text-xs shadow-md transition flex flex-col items-center">
-              <span>🕵️ 고학년 모드</span>
-              <span class="text-[10px] text-teal-200 font-normal">방탈출 방청소 미션</span>
-            </button>
-          </div>
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-black text-slate-700 mb-1">학교 이름 <span class="text-red-500">*</span></label>
+          <input type="text" id="input-school" required placeholder="예: 서울초등학교" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
 
-        <button onclick="startGame('stage2')" class="bg-white hover:bg-blue-50 border-2 border-blue-200 p-4 rounded-2xl font-bold text-left shadow-sm hover:border-blue-400 transition flex items-center justify-between">
-          <div>
-            <div class="text-xs font-black text-blue-600">2단계</div>
-            <div class="text-sm font-extrabold text-slate-800">🔍 X-Ray 마크 스캐너</div>
-            <div class="text-[11px] text-slate-400">분리배출 표시 마크 찾기</div>
-          </div>
-          <span class="text-2xl">🏷️</span>
-        </button>
+        <div>
+          <label class="block text-xs font-black text-slate-700 mb-1">학번 및 이름 <span class="text-red-500">*</span></label>
+          <input type="text" id="input-id-name" required placeholder="예: 50119 홍길동 (학년/반/번호/이름)" class="w-full border-2 border-slate-200 rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
 
-        <button onclick="startGame('stage3')" class="bg-white hover:bg-purple-50 border-2 border-purple-200 p-4 rounded-2xl font-bold text-left shadow-sm hover:border-purple-400 transition flex items-center justify-between">
-          <div>
-            <div class="text-xs font-black text-purple-600">3단계</div>
-            <div class="text-sm font-extrabold text-slate-800">🧼 4대 액션 챌린지</div>
-            <div class="text-[11px] text-slate-400">비우기·헹구기·분리·섞지않기</div>
-          </div>
-          <span class="text-2xl">🚿</span>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base flex items-center justify-center gap-2 mt-2">
+          <span>🚀 출동 준비 완료 (확인)</span>
         </button>
-
-        <button onclick="startGame('stage4')" class="sm:col-span-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white p-4 rounded-2xl font-black text-left shadow-lg transition flex items-center justify-between">
-          <div>
-            <div class="text-xs text-amber-200 font-bold">최종 보스전</div>
-            <div class="text-base sm:text-lg">⚡ 에코 마스터 60초 타임어택!</div>
-            <div class="text-xs text-amber-100 font-medium">전체 종합 실전 콤보 대결</div>
-          </div>
-          <span class="text-3xl">🏆</span>
-        </button>
-      </div>
+      </form>
     </div>
 
-    <!-- 1-A. [저학년 1단계: 스피드 스와이프 모드] -->
-    <div id="screen-stage1-low" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/40 space-y-6 bounce-in max-w-lg mx-auto w-full">
-      <div class="flex justify-between items-center border-b pb-3">
-        <span class="text-xs font-black text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">1단계 (저학년 모드)</span>
-        <span class="text-xs font-bold text-slate-500">남은 아이템: <span id="s1l-remain" class="text-emerald-600 font-black">10</span>개</span>
-      </div>
-
-      <div class="text-center space-y-1">
-        <h3 class="text-lg font-black text-slate-800">재활용이 되는 자원일까요?</h3>
-        <p class="text-xs text-slate-500">재활용은 오른쪽 ➡️ / 일반쓰레기는 왼쪽 ⬅️ 으로 넘겨주세요!</p>
-      </div>
-
-      <!-- 스와이프 카드 영역 -->
-      <div id="s1l-card" class="relative w-64 h-80 mx-auto bg-gradient-to-b from-slate-50 to-slate-100 rounded-3xl border-4 border-slate-200 shadow-xl flex flex-col items-center justify-center p-6 space-y-4 transition-transform duration-200">
-        <div id="s1l-emoji" class="text-7xl">🧃</div>
-        <div id="s1l-name" class="font-extrabold text-lg text-slate-800">깨끗한 음료수 팩</div>
-        <div id="s1l-desc" class="text-xs text-slate-500 text-center font-medium">물로 깨끗이 헹군 종이팩</div>
-      </div>
-
-      <!-- 버튼 컨트롤러 (크롬북/터치 겸용) -->
-      <div class="grid grid-cols-2 gap-3 max-w-xs mx-auto pt-2">
-        <button onclick="handleSwipe('trash')" class="bg-red-500 hover:bg-red-600 active:scale-95 text-white py-3.5 rounded-2xl font-black text-sm shadow-md transition flex items-center justify-center gap-1.5">
-          <span>⬅️ 일반쓰레기</span>
-        </button>
-        <button onclick="handleSwipe('recycle')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white py-3.5 rounded-2xl font-black text-sm shadow-md transition flex items-center justify-center gap-1.5">
-          <span>재활용 자원 ➡️</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- 1-B. [고학년 1단계: 방탈출 방청소 탐색 미션] -->
-    <div id="screen-stage1-high" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/40 space-y-4 bounce-in max-w-2xl mx-auto w-full">
-      <div class="flex justify-between items-center border-b pb-2">
-        <span class="text-xs font-black text-teal-800 bg-teal-100 px-3 py-1 rounded-full">1단계 (고학년 방탈출 미션)</span>
-        <span class="text-xs font-bold text-slate-500">찾은 쓰레기: <span id="s1h-found" class="text-teal-600 font-black">0</span> / 6</span>
-      </div>
-
-      <div class="text-center">
-        <h3 class="text-base sm:text-lg font-black text-slate-800">어질러진 교실에서 쓰레기를 찾아 올바르게 분류하세요!</h3>
-        <p class="text-xs text-slate-500">방 안의 숨겨진 물건들을 터치/클릭하여 수거하세요.</p>
-      </div>
-
-      <!-- 방탈출 가상 방 뷰포트 -->
-      <div class="relative w-full h-72 sm:h-80 bg-gradient-to-b from-sky-100 via-amber-50 to-amber-100 rounded-2xl border-4 border-slate-300 overflow-hidden shadow-inner flex items-center justify-center">
-        <!-- 배경 그래픽 사물들 -->
-        <div class="absolute left-6 top-8 text-5xl opacity-40">🪟</div>
-        <div class="absolute right-8 top-10 text-4xl opacity-40">🕒</div>
-        <div class="absolute left-1/2 bottom-8 -translate-x-1/2 text-7xl opacity-50">🛋️</div>
-
-        <!-- 클릭 가능한 숨겨진 쓰레기 아이템 6개 -->
-        <button onclick="inspectHighItem(0)" id="h-item-0" class="absolute left-12 bottom-12 text-4xl hover:scale-125 transition transform animate-pulse">🥤</button>
-        <button onclick="inspectHighItem(1)" id="h-item-1" class="absolute right-16 bottom-16 text-4xl hover:scale-125 transition transform animate-pulse">📦</button>
-        <button onclick="inspectHighItem(2)" id="h-item-2" class="absolute left-1/3 top-16 text-4xl hover:scale-125 transition transform animate-pulse">🍕</button>
-        <button onclick="inspectHighItem(3)" id="h-item-3" class="absolute right-1/4 top-20 text-4xl hover:scale-125 transition transform animate-pulse">🍾</button>
-        <button onclick="inspectHighItem(4)" id="h-item-4" class="absolute left-20 top-24 text-4xl hover:scale-125 transition transform animate-pulse">🥡</button>
-        <button onclick="inspectHighItem(5)" id="h-item-5" class="absolute right-12 bottom-36 text-4xl hover:scale-125 transition transform animate-pulse">🧴</button>
-      </div>
-
-      <!-- 아이템 분석 팝업/슬롯 -->
-      <div id="h-inspect-box" class="hidden bg-slate-800 text-white p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in">
-        <div class="flex items-center gap-3">
-          <span id="h-inspect-emoji" class="text-4xl">🥤</span>
-          <div>
-            <div id="h-inspect-name" class="font-bold text-sm">일회용 플라스틱 컵</div>
-            <div id="h-inspect-desc" class="text-xs text-slate-300">내용물이 비워져 있고 깨끗한 투명 컵</div>
-          </div>
-        </div>
+    <!-- ================= 1. [1단계: 10개 숨은그림찾기 & 분리수거 드래그] ================= -->
+    <div id="screen-stage1" class="hidden w-full space-y-3 bounce-in">
+      
+      <!-- 상단 상태 & 마이너스 카운터 -->
+      <div class="bg-white/90 backdrop-blur rounded-2xl p-3 sm:p-4 shadow-lg flex justify-between items-center border border-white/40">
         <div class="flex items-center gap-2">
-          <button onclick="classifyHighItem('trash')" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl text-xs font-bold">일반쓰레기</button>
-          <button onclick="classifyHighItem('recycle')" class="bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-xl text-xs font-bold">재활용</button>
+          <span class="bg-emerald-100 text-emerald-800 font-black text-xs px-3 py-1 rounded-full">1단계 미션</span>
+          <span id="s1-scene-title" class="font-extrabold text-xs sm:text-sm text-slate-800">📍 장소: 어질러진 놀이동산</span>
+        </div>
+
+        <!-- ⭐ 마이너스 카운터 (10 -> 0) -->
+        <div class="bg-red-500 text-white font-black px-4 py-1.5 rounded-xl text-xs sm:text-sm shadow-md flex items-center gap-1.5 animate-pulse">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>남은 쓰레기: <span id="s1-countdown" class="text-yellow-300 text-base">10</span>개</span>
+        </div>
+      </div>
+
+      <!-- 숨은그림찾기 게임 맵 (가상 씬 뷰포트) -->
+      <div id="s1-map-viewport" class="relative w-full h-[360px] sm:h-[420px] bg-slate-800 rounded-3xl border-4 border-slate-300/80 overflow-hidden shadow-2xl">
+        <!-- 동적 배경 그래픽 장식 -->
+        <div id="s1-bg-elements" class="absolute inset-0 pointer-events-none"></div>
+
+        <!-- 10개의 숨겨진 쓰레기 아이템들 (JS로 동적 배치) -->
+        <div id="s1-items-layer" class="absolute inset-0"></div>
+
+        <!-- 아이템 주웠을 때 안내 오버레이 -->
+        <div id="s1-item-picked-tray" class="hidden absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-5 py-2.5 rounded-2xl border-2 border-yellow-400 shadow-2xl flex items-center gap-3 z-30 animate-bounce">
+          <span id="picked-emoji" class="text-3xl">🧴</span>
+          <div class="text-left">
+            <div id="picked-name" class="font-black text-xs sm:text-sm text-yellow-300">투명 페트병</div>
+            <div class="text-[11px] text-slate-300">아래 알맞은 분리수거통으로 드래그하거나 터치하세요!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 4색 분리수거함 (드롭 타겟) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
+        <div id="bin-plastic" onclick="handleBinDrop('plastic')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'plastic')" class="bg-yellow-100/95 hover:bg-yellow-200 border-4 border-yellow-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+          <div class="text-3xl">🟡</div>
+          <div class="text-xs font-black text-yellow-900">플라스틱 / PET</div>
+          <div class="text-[10px] text-yellow-700 font-semibold">페트병, 배달용기 등</div>
+        </div>
+
+        <div id="bin-can-glass" onclick="handleBinDrop('can_glass')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'can_glass')" class="bg-blue-100/95 hover:bg-blue-200 border-4 border-blue-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+          <div class="text-3xl">🔵</div>
+          <div class="text-xs font-black text-blue-900">캔류 / 유리병</div>
+          <div class="text-[10px] text-blue-700 font-semibold">음료수캔, 탄산수병 등</div>
+        </div>
+
+        <div id="bin-paper-vinyl" onclick="handleBinDrop('paper_vinyl')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'paper_vinyl')" class="bg-emerald-100/95 hover:bg-emerald-200 border-4 border-emerald-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+          <div class="text-3xl">🟢</div>
+          <div class="text-xs font-black text-emerald-900">종이류 / 비닐류</div>
+          <div class="text-[10px] text-emerald-700 font-semibold">박스, 깨끗한 과자봉지</div>
+        </div>
+
+        <div id="bin-trash" onclick="handleBinDrop('trash')" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'trash')" class="bg-red-100/95 hover:bg-red-200 border-4 border-red-400 p-3 rounded-2xl text-center space-y-1 shadow-lg transition active:scale-95 cursor-pointer">
+          <div class="text-3xl">🔴</div>
+          <div class="text-xs font-black text-red-900">일반쓰레기 (종량제)</div>
+          <div class="text-[10px] text-red-700 font-semibold">양념 묻은 피자박스 등</div>
         </div>
       </div>
     </div>
 
-    <!-- 2. [2단계: X-Ray 마크 스캐너 & 대체품 매칭] -->
-    <div id="screen-stage2" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/40 space-y-5 bounce-in max-w-xl mx-auto w-full">
+    <!-- ================= 2. [2단계: X-Ray 마크 스캐너] ================= -->
+    <div id="screen-stage2" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/40 space-y-5 bounce-in max-w-xl w-full">
       <div class="flex justify-between items-center border-b pb-2">
-        <span class="text-xs font-black text-blue-700 bg-blue-100 px-3 py-1 rounded-full">2단계: 마크 스캐너</span>
-        <span class="text-xs font-bold text-slate-500">진행: <span id="s2-progress">1</span> / 4</span>
+        <span class="text-xs font-black text-blue-700 bg-blue-100 px-3 py-1 rounded-full">2단계 미션</span>
+        <span class="text-xs font-bold text-slate-500">스캔 진행: <span id="s2-step">1</span> / 4</span>
       </div>
 
       <div class="text-center space-y-1">
-        <h3 class="text-lg font-black text-slate-800">돋보기로 스캔하고 올바른 분리수거함에 넣으세요!</h3>
-        <p class="text-xs text-slate-500">어떤 마크가 적혀있는지 돋보기를 터치해보세요.</p>
+        <h3 class="text-lg font-black text-slate-800">X-Ray 돋보기로 숨겨진 재활용 마크를 찾으세요!</h3>
+        <p class="text-xs text-slate-500">마크를 스캔하여 확인한 후 알맞은 분리수거통을 선택하세요.</p>
       </div>
 
-      <!-- 카드 스캔 공간 -->
-      <div class="relative bg-slate-100 rounded-2xl p-6 border-2 border-slate-300 flex flex-col items-center justify-center space-y-3">
-        <div id="s2-item-emoji" class="text-6xl">🧴</div>
+      <div class="relative bg-slate-100 rounded-3xl p-6 border-2 border-slate-300 flex flex-col items-center justify-center space-y-3">
+        <div id="s2-item-emoji" class="text-7xl">🧴</div>
         <div id="s2-item-name" class="font-extrabold text-base text-slate-800">투명 음료 페트병</div>
 
-        <!-- X-Ray 마크 (터치/클릭 시 해금) -->
-        <button onclick="revealMark()" id="s2-scan-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow transition">
+        <button onclick="revealMark()" id="s2-scan-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-5 py-2.5 rounded-2xl flex items-center gap-1.5 shadow-lg transition active:scale-95">
           <i data-lucide="scan" class="w-4 h-4"></i> <span>X-Ray 돋보기로 스캔하기</span>
         </button>
-        <div id="s2-mark-badge" class="hidden bg-yellow-300 text-slate-900 border-2 border-yellow-500 font-black text-sm px-4 py-1.5 rounded-full animate-bounce">
+        <div id="s2-mark-badge" class="hidden bg-yellow-300 text-slate-900 border-2 border-yellow-500 font-black text-base px-5 py-2 rounded-full shadow animate-bounce">
           PET (페트)
         </div>
       </div>
 
-      <!-- 3색 분리수거함 선택 -->
       <div class="grid grid-cols-3 gap-2 pt-2">
-        <button onclick="checkBin('plastic')" class="bg-yellow-50 hover:bg-yellow-100 border-2 border-yellow-300 p-3 rounded-2xl text-center space-y-1 transition active:scale-95">
+        <button onclick="checkStage2Bin('plastic')" class="bg-yellow-50 hover:bg-yellow-100 border-2 border-yellow-400 p-3 rounded-2xl text-center space-y-1 transition active:scale-95">
           <div class="text-2xl">🟡</div>
-          <div class="text-xs font-black text-yellow-800">플라스틱 / PET</div>
+          <div class="text-xs font-black text-yellow-900">플라스틱 / PET</div>
         </button>
-        <button onclick="checkBin('glass')" class="bg-blue-50 hover:bg-blue-100 border-2 border-blue-300 p-3 rounded-2xl text-center space-y-1 transition active:scale-95">
+        <button onclick="checkStage2Bin('glass')" class="bg-blue-50 hover:bg-blue-100 border-2 border-blue-400 p-3 rounded-2xl text-center space-y-1 transition active:scale-95">
           <div class="text-2xl">🔵</div>
-          <div class="text-xs font-black text-blue-800">유리병 / 캔</div>
+          <div class="text-xs font-black text-blue-900">유리병 / 캔류</div>
         </button>
-        <button onclick="checkBin('paper')" class="bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-300 p-3 rounded-2xl text-center space-y-1 transition active:scale-95">
+        <button onclick="checkStage2Bin('paper')" class="bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-400 p-3 rounded-2xl text-center space-y-1 transition active:scale-95">
           <div class="text-2xl">🟢</div>
-          <div class="text-xs font-black text-emerald-800">종이 / 비닐</div>
+          <div class="text-xs font-black text-emerald-900">종이 / 비닐류</div>
         </button>
       </div>
     </div>
 
-    <!-- 3. [3단계: 4대 액션 챌린지 (비우기/헹구기/분리/섞지않기)] -->
-    <div id="screen-stage3" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/40 space-y-5 bounce-in max-w-lg mx-auto w-full">
+    <!-- ================= 3. [3단계: 4대 액션 챌린지] ================= -->
+    <div id="screen-stage3" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/40 space-y-5 bounce-in max-w-lg w-full">
       <div class="flex justify-between items-center border-b pb-2">
-        <span class="text-xs font-black text-purple-700 bg-purple-100 px-3 py-1 rounded-full">3단계: 4대 액션 챌린지</span>
-        <span id="s3-step-indicator" class="text-xs font-bold text-purple-600">ACTION 1 / 4</span>
+        <span class="text-xs font-black text-purple-700 bg-purple-100 px-3 py-1 rounded-full">3단계 미션</span>
+        <span id="s3-step-indicator" class="text-xs font-black text-purple-600">ACTION 1 / 4</span>
       </div>
 
       <div class="text-center space-y-1">
         <h3 id="s3-title" class="text-lg font-black text-slate-800">1. 비운다: 내용물을 깨끗이 비워주세요!</h3>
-        <p id="s3-desc" class="text-xs text-slate-500">화면의 통을 톡톡 3번 터치하여 잔여물을 버리세요 ⬇️</p>
+        <p id="s3-desc" class="text-xs text-slate-500">페트병을 3번 터치하여 남은 음료를 쏟아내세요.</p>
       </div>
 
-      <!-- 액션 인터랙티브 스테이지 -->
-      <div id="s3-stage" class="h-64 bg-purple-50 rounded-2xl border-4 border-purple-200 relative flex flex-col items-center justify-center p-4 overflow-hidden">
-        <div id="s3-interactive-icon" onclick="handleActionClick()" class="text-7xl cursor-pointer hover:scale-110 active:scale-95 transition transform">
+      <div id="s3-stage" class="h-64 bg-purple-50 rounded-3xl border-4 border-purple-200 relative flex flex-col items-center justify-center p-4 overflow-hidden">
+        <div id="s3-interactive-icon" onclick="handleActionClick()" class="text-8xl cursor-pointer hover:scale-110 active:scale-90 transition transform">
           🥤
         </div>
-        <div id="s3-action-feedback" class="text-sm font-extrabold text-purple-800 mt-3">
-          터치하여 비우기 (<span id="s3-tap-count">0</span> / 3)
+        <div id="s3-action-feedback" class="text-sm font-black text-purple-800 mt-4 bg-purple-100 px-4 py-1.5 rounded-full">
+          터치하여 비우기 (0 / 3)
         </div>
       </div>
 
-      <!-- 4단계 섞지않기용 다중 바구니 (4단계 액션 시 노출) -->
       <div id="s3-bin-selector" class="hidden grid grid-cols-3 gap-2">
-        <button onclick="selectSeparateBin('body')" class="bg-yellow-100 border border-yellow-400 p-2.5 rounded-xl font-bold text-xs text-yellow-900">1. 몸통 (플라스틱함)</button>
-        <button onclick="selectSeparateBin('label')" class="bg-pink-100 border border-pink-400 p-2.5 rounded-xl font-bold text-xs text-pink-900">2. 라벨 (비닐함)</button>
-        <button onclick="selectSeparateBin('cap')" class="bg-blue-100 border border-blue-400 p-2.5 rounded-xl font-bold text-xs text-blue-900">3. 뚜껑 (따로모음)</button>
+        <button onclick="selectSeparateBin('body')" class="bg-yellow-100 border-2 border-yellow-400 p-3 rounded-2xl font-black text-xs text-yellow-900">1. 몸통 (플라스틱)</button>
+        <button onclick="selectSeparateBin('label')" class="bg-pink-100 border-2 border-pink-400 p-3 rounded-2xl font-black text-xs text-pink-900">2. 라벨 (비닐류)</button>
+        <button onclick="selectSeparateBin('cap')" class="bg-blue-100 border-2 border-blue-400 p-3 rounded-2xl font-black text-xs text-blue-900">3. 뚜껑 (따로모음)</button>
       </div>
     </div>
 
-    <!-- 4. [4단계: 최종 보스 60초 타임어택] -->
-    <div id="screen-stage4" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/40 space-y-4 bounce-in max-w-xl mx-auto w-full">
+    <!-- ================= 4. [4단계: 60초 최종 보스 타임어택] ================= -->
+    <div id="screen-stage4" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/40 space-y-4 bounce-in max-w-xl w-full">
       <div class="flex justify-between items-center border-b pb-2">
-        <span class="text-xs font-black text-orange-700 bg-orange-100 px-3 py-1 rounded-full">최종 보스: 60초 타임어택</span>
-        <div class="flex items-center gap-1 text-sm font-black text-red-600">
-          <i data-lucide="timer" class="w-4 h-4"></i>
+        <span class="text-xs font-black text-orange-700 bg-orange-100 px-3 py-1 rounded-full">최종 보스 타임어택</span>
+        <div class="flex items-center gap-1.5 text-sm font-black text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-200">
+          <i data-lucide="timer" class="w-4 h-4 animate-spin"></i>
           <span id="s4-timer">60</span>초
         </div>
       </div>
 
       <div class="text-center">
-        <div class="text-xs font-bold text-slate-400">COMBO: <span id="s4-combo" class="text-orange-500 font-black text-base">0</span></div>
+        <div class="text-xs font-bold text-slate-400">COMBO: <span id="s4-combo" class="text-orange-500 font-black text-xl">0</span></div>
       </div>
 
-      <!-- 컨베이어 벨트 중앙 디스플레이 -->
-      <div class="h-44 bg-slate-800 rounded-2xl border-4 border-slate-700 relative flex flex-col items-center justify-center p-4 text-white space-y-2 overflow-hidden shadow-inner">
+      <div class="h-44 bg-slate-900 rounded-3xl border-4 border-slate-700 relative flex flex-col items-center justify-center p-4 text-white space-y-2 overflow-hidden shadow-inner">
         <div id="s4-item-emoji" class="text-6xl animate-bounce">📦</div>
         <div id="s4-item-name" class="font-extrabold text-sm">테이프가 붙은 택배상자</div>
-        <div id="s4-item-hint" class="text-[11px] text-amber-300 font-medium">⚠️ 테이프를 떼고 배출해야 해요!</div>
+        <div id="s4-item-hint" class="text-[11px] text-amber-300 font-medium">⚠️ 테이프를 먼저 떼야 해요!</div>
       </div>
 
-      <!-- 빠른 3선택 버튼 (크롬북 키보드 1, 2, 3 지원) -->
       <div class="grid grid-cols-3 gap-2 pt-2">
-        <button onclick="handleBossAction('action')" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white p-3 rounded-2xl font-black text-xs shadow-md space-y-1">
+        <button onclick="handleBossAction('action')" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white p-3.5 rounded-2xl font-black text-xs shadow-md space-y-1">
           <div>✂️ 비우기/라벨제거</div>
           <div class="text-[10px] text-indigo-200">[행동 먼저!]</div>
         </button>
-        <button onclick="handleBossAction('recycle')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white p-3 rounded-2xl font-black text-xs shadow-md space-y-1">
+        <button onclick="handleBossAction('recycle')" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white p-3.5 rounded-2xl font-black text-xs shadow-md space-y-1">
           <div>♻️ 바로 재활용</div>
           <div class="text-[10px] text-emerald-200">[깨끗한 자원]</div>
         </button>
-        <button onclick="handleBossAction('trash')" class="bg-red-500 hover:bg-red-600 active:scale-95 text-white p-3 rounded-2xl font-black text-xs shadow-md space-y-1">
+        <button onclick="handleBossAction('trash')" class="bg-red-500 hover:bg-red-600 active:scale-95 text-white p-3.5 rounded-2xl font-black text-xs shadow-md space-y-1">
           <div>🗑️ 일반 쓰레기</div>
           <div class="text-[10px] text-red-200">[재활용 불가]</div>
         </button>
       </div>
     </div>
 
-    <!-- 5. [결과 화면: 인증서 및 최종 점수] -->
-    <div id="screen-result" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/40 space-y-6 bounce-in max-w-md mx-auto w-full text-center">
-      <div class="text-5xl">🏆</div>
+    <!-- ================= 5. [결과 화면: 최종 인증서] ================= -->
+    <div id="screen-result" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-yellow-400 max-w-md w-full text-center space-y-6 bounce-in">
+      <div class="text-6xl animate-bounce">🏆</div>
       <div class="space-y-1">
-        <span class="bg-yellow-100 text-yellow-800 text-xs font-black px-3 py-1 rounded-full">MISSION COMPLETE</span>
-        <h2 class="text-2xl font-black text-slate-800">에코 마스터 인증 완료!</h2>
-        <p id="result-user" class="text-xs text-slate-500">서울초 5-2 홍길동 요원</p>
+        <span class="bg-yellow-100 text-yellow-800 text-xs font-black px-4 py-1.5 rounded-full border border-yellow-300">MISSION COMPLETE</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800">에코 마스터 인증 완료!</h2>
+        <p id="result-user" class="text-xs text-slate-500 font-bold">서울초 50119 홍길동 요원</p>
       </div>
 
-      <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 space-y-2">
-        <div class="text-xs text-slate-500">최종 획득 점수</div>
-        <div id="result-score" class="text-4xl font-black text-emerald-600">1,250점</div>
-        <div id="result-rank-text" class="text-xs font-bold text-amber-600">🌟 완벽한 지구 수호자 등급!</div>
+      <div class="bg-slate-50 border-2 border-slate-200 rounded-3xl p-5 space-y-2">
+        <div class="text-xs text-slate-400 font-bold">최종 작전 점수</div>
+        <div id="result-score" class="text-4xl font-black text-emerald-600">1,450점</div>
+        <div class="text-xs font-bold text-amber-600">🌟 완벽한 지구 수호자 등급 달성!</div>
       </div>
 
-      <button onclick="returnToLobby()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3.5 rounded-xl shadow-lg transition text-sm">
-        다시 도전하기 / 단계 선택으로 이동
+      <button onclick="restartGame()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black py-4 rounded-2xl shadow-xl transition text-base">
+        처음부터 다시 도전하기 🔄
       </button>
     </div>
 
   </main>
 
-  <footer class="p-3 text-center text-xs text-white/70 font-medium">
+  <footer class="p-3 text-center text-xs text-white/60 font-medium">
     국립과천과학관 분리배출 카드게임 기반 에듀테크 인터랙티브 웹앱
   </footer>
 
   <!-- ================= JavaScript 게임 엔진 ================= -->
   <script>
-    // --- 글로벌 상태 관리 ---
     let soundEnabled = true;
     let totalScore = 0;
-    let currentStage = 'lobby';
+    let playerSchool = "";
+    let playerIdName = "";
 
-    // 오디오 합성 엔진 (Web Audio API - 외부 음원 없이 100% 자체 소리 발생)
+    // Web Audio Synthesizer 효과음
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(freq, type, duration) {
+    function playTone(freq, type, duration) {
       if (!soundEnabled) return;
       try {
         const osc = audioCtx.createOscillator();
@@ -345,15 +289,17 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
         osc.stop(audioCtx.currentTime + duration);
       } catch(e){}
     }
-    function soundCorrect() { playBeep(587, 'sine', 0.1); setTimeout(()=>playBeep(880, 'sine', 0.2), 100); }
-    function soundWrong() { playBeep(220, 'sawtooth', 0.25); }
+    function soundPickup() { playTone(523, 'sine', 0.1); setTimeout(()=>playTone(659, 'sine', 0.15), 60); }
+    function soundSuccess() { playTone(587, 'triangle', 0.1); setTimeout(()=>playTone(880, 'triangle', 0.25), 100); }
+    function soundFail() { playTone(180, 'sawtooth', 0.3); }
+
     function toggleSound() {
       soundEnabled = !soundEnabled;
-      document.getElementById('sound-btn').innerHTML = soundEnabled ? '<i data-lucide="volume-2" class="w-5 h-5"></i>' : '<i data-lucide="volume-x" class="w-5 h-5"></i>';
+      document.getElementById('sound-btn').innerHTML = soundEnabled ? '<i data-lucide="volume-2" class="w-4 h-4"></i>' : '<i data-lucide="volume-x" class="w-4 h-4"></i>';
       lucide.createIcons();
     }
 
@@ -362,124 +308,152 @@
       document.getElementById('global-score').innerText = totalScore;
     }
 
-    // --- 화면 전환 헬퍼 ---
-    function showScreen(screenId) {
-      ['screen-lobby', 'screen-stage1-low', 'screen-stage1-high', 'screen-stage2', 'screen-stage3', 'screen-stage4', 'screen-result'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
+    function showScreen(id) {
+      ['screen-login', 'screen-stage1', 'screen-stage2', 'screen-stage3', 'screen-stage4', 'screen-result'].forEach(s => {
+        document.getElementById(s).classList.add('hidden');
       });
-      document.getElementById(screenId).classList.remove('hidden');
+      document.getElementById(id).classList.remove('hidden');
       lucide.createIcons();
     }
 
-    function startGame(stage) {
-      const school = document.getElementById('player-school').value.trim() || '우리학교';
-      const name = document.getElementById('player-name').value.trim() || '에코요원';
-      document.getElementById('header-user-info').innerText = `${school} ${name}`;
+    // ================= 0. [로그인 확인 및 시작] =================
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      playerSchool = document.getElementById('input-school').value.trim();
+      playerIdName = document.getElementById('input-id-name').value.trim();
 
-      if (stage === 'stage1_low') initStage1Low();
-      else if (stage === 'stage1_high') initStage1High();
-      else if (stage === 'stage2') initStage2();
-      else if (stage === 'stage3') initStage3();
-      else if (stage === 'stage4') initStage4();
+      document.getElementById('header-user-tag').innerText = `${playerSchool} ${playerIdName}`;
+      document.getElementById('game-header').classList.remove('hidden');
+      
+      soundSuccess();
+      initStage1(); // 1단계 10개 숨은그림찾기로 직행!
     }
 
-    // ================= [1-A. 저학년 스피드 스와이프 로직] =================
-    const s1lItems = [
-      { name: "투명 생수 페트병", type: "recycle", emoji: "🧴", desc: "라벨 떼고 찌그러뜨린 페트병" },
-      { name: "양념 묻은 피자박스", type: "trash", emoji: "🍕", desc: "기름과 치즈가 묻은 종이" },
-      { name: "깨끗한 알루미늄 캔", type: "recycle", emoji: "🥫", desc: "물로 헹군 음료수 캔" },
-      { name: "비닐 코팅된 종이컵", type: "trash", emoji: "🥤", desc: "재활용이 어려운 일회용 컵" },
-      { name: "음료수 유리병", type: "recycle", emoji: "🍾", desc: "담배꽁초 없는 깨끗한 병" },
-      { name: "더러운 비닐봉투", type: "trash", emoji: "🛍️", desc: "이물질이 잔뜩 묻은 비닐" }
+    // ================= 1. [1단계: 10개 숨은그림찾기 & 드래그 분리배출] =================
+    const scenes = [
+      {
+        title: "📍 장소: 어질러진 놀이동산",
+        bgHtml: `
+          <div class="absolute left-6 top-8 text-6xl opacity-30">🎡</div>
+          <div class="absolute right-8 top-12 text-5xl opacity-30">🎪</div>
+          <div class="absolute left-1/3 top-10 text-6xl opacity-20">🎢</div>
+          <div class="absolute right-1/4 bottom-6 text-7xl opacity-25">🎠</div>
+          <div class="absolute inset-0 bg-gradient-to-b from-sky-900/60 via-indigo-950/80 to-slate-900/90"></div>
+        `
+      }
     ];
-    let s1lIndex = 0;
 
-    function initStage1Low() {
-      s1lIndex = 0;
-      showScreen('screen-stage1-low');
-      renderS1LCard();
+    const s1ItemsData = [
+      { id: 0, name: "투명 생수 페트병", emoji: "🧴", bin: "plastic", x: 12, y: 20 },
+      { id: 1, name: "알루미늄 탄산 캔", emoji: "🥫", bin: "can_glass", x: 82, y: 18 },
+      { id: 2, name: "기름 묻은 피자 박스", emoji: "🍕", bin: "trash", x: 45, y: 35 },
+      { id: 3, name: "택배 종이 상자", emoji: "📦", bin: "paper_vinyl", x: 20, y: 70 },
+      { id: 4, name: "투명 음료 유리병", emoji: "🍾", bin: "can_glass", x: 75, y: 65 },
+      { id: 5, name: "깨끗한 과자 비닐봉투", emoji: "🥨", bin: "paper_vinyl", x: 30, y: 15 },
+      { id: 6, name: "양념 범벅 컵라면 용기", emoji: "🥡", bin: "trash", x: 60, y: 22 },
+      { id: 7, name: "플라스틱 배달 용기", emoji: "🍱", bin: "plastic", x: 88, y: 75 },
+      { id: 8, name: "다 쓴 건전지", emoji: "🔋", bin: "trash", x: 10, y: 45 },
+      { id: 9, name: "비닐 코팅 일회용 종이컵", emoji: "🥤", bin: "trash", x: 50, y: 78 }
+    ];
+
+    let s1Remaining = 10;
+    let activePickedItem = null;
+
+    function initStage1() {
+      showScreen('screen-stage1');
+      s1Remaining = 10;
+      activePickedItem = null;
+      document.getElementById('s1-countdown').innerText = '10';
+      document.getElementById('s1-bg-elements').innerHTML = scenes[0].bgHtml;
+      document.getElementById('s1-scene-title').innerText = scenes[0].title;
+      document.getElementById('s1-item-picked-tray').classList.add('hidden');
+
+      const itemsLayer = document.getElementById('s1-items-layer');
+      itemsLayer.innerHTML = '';
+
+      // 10개 숨은 쓰레기 아이템 맵에 배치
+      s1ItemsData.forEach(item => {
+        const btn = document.createElement('button');
+        btn.id = `s1-btn-${item.id}`;
+        btn.className = "absolute text-3xl sm:text-4xl hover:scale-125 active:scale-90 transition transform p-2 cursor-pointer animate-pulse drop-shadow-lg";
+        btn.style.left = `${item.x}%`;
+        btn.style.top = `${item.y}%`;
+        btn.innerText = item.emoji;
+        btn.onclick = () => pickHiddenItem(item);
+        btn.draggable = true;
+        btn.ondragstart = (e) => {
+          pickHiddenItem(item);
+          e.dataTransfer.setData("text/plain", item.id);
+        };
+        itemsLayer.appendChild(btn);
+      });
     }
 
-    function renderS1LCard() {
-      if (s1lIndex >= s1lItems.length) {
-        finishStage(300, "1단계 저학년 스와이프 클리어!");
+    function pickHiddenItem(item) {
+      activePickedItem = item;
+      soundPickup();
+
+      // 주운 아이템 안내창 띄우기
+      document.getElementById('picked-emoji').innerText = item.emoji;
+      document.getElementById('picked-name').innerText = item.name;
+      document.getElementById('s1-item-picked-tray').classList.remove('hidden');
+
+      // 맵 상에서 반짝이게 강조
+      document.querySelectorAll('#s1-items-layer button').forEach(b => b.classList.remove('glow'));
+      const activeBtn = document.getElementById(`s1-btn-${item.id}`);
+      if (activeBtn) activeBtn.classList.add('glow');
+    }
+
+    function allowDrop(e) { e.preventDefault(); }
+    function handleDrop(e, binType) {
+      e.preventDefault();
+      handleBinDrop(binType);
+    }
+
+    function handleBinDrop(binType) {
+      if (!activePickedItem) {
+        alert("🔍 먼저 화면 속 숨겨진 쓰레기 아이템을 터치해 선택하세요!");
         return;
       }
-      const item = s1lItems[s1lIndex];
-      document.getElementById('s1l-remain').innerText = s1lItems.length - s1lIndex;
-      document.getElementById('s1l-name').innerText = item.name;
-      document.getElementById('s1l-desc').innerText = item.desc;
-      document.getElementById('s1l-emoji').innerText = item.emoji;
-      document.getElementById('s1l-card').style.transform = 'none';
-    }
 
-    function handleSwipe(choice) {
-      const item = s1lItems[s1lIndex];
-      const card = document.getElementById('s1l-card');
-      if (item.type === choice) {
-        soundCorrect();
-        addScore(50);
-        card.style.transform = choice === 'recycle' ? 'translateX(150px) rotate(15deg)' : 'translateX(-150px) rotate(-15deg)';
-      } else {
-        soundWrong();
-        card.classList.add('shake-anim');
-        setTimeout(()=>card.classList.remove('shake-anim'), 500);
-      }
-      s1lIndex++;
-      setTimeout(renderS1LCard, 250);
-    }
+      if (activePickedItem.bin === binType) {
+        // 정답!
+        soundSuccess();
+        addScore(100);
+        
+        // 맵에서 아이템 제거
+        const btn = document.getElementById(`s1-btn-${activePickedItem.id}`);
+        if (btn) btn.remove();
 
-    // ================= [1-B. 고학년 방탈출 방청소 로직] =================
-    const s1hItems = [
-      { id: 0, name: "투명 일회용 컵", type: "recycle", emoji: "🥤", desc: "물로 깨끗이 헹군 투명 플라스틱" },
-      { id: 1, name: "택배 종이 상자", type: "recycle", emoji: "📦", desc: "테이프와 송장을 뗀 종이 박스" },
-      { id: 2, name: "기름 묻은 피자 박스", type: "trash", emoji: "🍕", desc: "음식물이 묻어 재활용 불가!" },
-      { id: 3, name: "음료수 유리병", type: "recycle", emoji: "🍾", desc: "뚜껑을 분리한 깨끗한 유리병" },
-      { id: 4, name: "빨간 국물 컵라면 용기", type: "trash", emoji: "🥡", desc: "양념이 물든 스티로폼" },
-      { id: 5, name: "샴푸 플라스틱 용기", type: "recycle", emoji: "🧴", desc: "물로 헹군 플라스틱 통" }
-    ];
-    let s1hFoundCount = 0;
-    let s1hCurrentItem = null;
+        document.getElementById('s1-item-picked-tray').classList.add('hidden');
+        activePickedItem = null;
 
-    function initStage1High() {
-      s1hFoundCount = 0;
-      showScreen('screen-stage1-high');
-      document.getElementById('s1h-found').innerText = '0';
-      document.getElementById('h-inspect-box').classList.add('hidden');
-      for (let i = 0; i < 6; i++) {
-        document.getElementById(`h-item-${i}`).style.display = 'block';
-      }
-    }
+        // ⭐ 마이너스 카운팅
+        s1Remaining--;
+        document.getElementById('s1-countdown').innerText = s1Remaining;
 
-    function inspectHighItem(idx) {
-      s1hCurrentItem = s1hItems[idx];
-      document.getElementById('h-inspect-emoji').innerText = s1hCurrentItem.emoji;
-      document.getElementById('h-inspect-name').innerText = s1hCurrentItem.name;
-      document.getElementById('h-inspect-desc').innerText = s1hCurrentItem.desc;
-      document.getElementById('h-inspect-box').classList.remove('hidden');
-    }
-
-    function classifyHighItem(choice) {
-      if (!s1hCurrentItem) return;
-      if (s1hCurrentItem.type === choice) {
-        soundCorrect();
-        addScore(60);
-        document.getElementById(`h-item-${s1hCurrentItem.id}`).style.display = 'none';
-        document.getElementById('h-inspect-box').classList.add('hidden');
-        s1hFoundCount++;
-        document.getElementById('s1h-found').innerText = s1hFoundCount;
-        if (s1hFoundCount >= 6) {
-          setTimeout(() => finishStage(400, "1단계 고학년 방탈출 미션 완벽 클리어!"), 500);
+        if (s1Remaining <= 0) {
+          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+          setTimeout(() => {
+            alert("🎉 [1단계 완료!] 10개의 숨은 쓰레기를 모두 분리배출했습니다!\n다음 2단계 마크 스캐너로 이동합니다.");
+            initStage2();
+          }, 500);
         }
       } else {
-        soundWrong();
-        alert("❌ 올바른 분류가 아닙니다! 다시 생각해보세요.");
+        // 오답
+        soundFail();
+        const binEl = document.getElementById(`bin-${binType.replace('_', '-')}`);
+        if (binEl) {
+          binEl.classList.add('shake');
+          setTimeout(() => binEl.classList.remove('shake'), 400);
+        }
+        alert("❌ 잘못된 분리수거통입니다! 다시 생각해보세요.");
       }
     }
 
-    // ================= [2단계: X-Ray 마크 스캐너 로직] =================
+    // ================= 2. [2단계: X-Ray 마크 스캐너] =================
     const s2Items = [
-      { name: "음료수 페트병", emoji: "🧴", mark: "PET (페트)", bin: "plastic" },
+      { name: "투명 음료 페트병", emoji: "🧴", mark: "PET (페트)", bin: "plastic" },
       { name: "통조림 참치 캔", emoji: "🥫", mark: "CAN (캔류)", bin: "glass" },
       { name: "과자 포장 비닐", emoji: "🥨", mark: "OTHER (비닐류)", bin: "paper" },
       { name: "탄산수 유리병", emoji: "🍾", mark: "유리 (GLASS)", bin: "glass" }
@@ -494,11 +468,15 @@
 
     function renderS2() {
       if (s2Index >= s2Items.length) {
-        finishStage(400, "2단계 분리배출 마크 마스터!");
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        setTimeout(() => {
+          alert("🎉 [2단계 완료!] 분리배출 마크를 완벽히 마스터했습니다!\n3단계 4대 액션 챌린지로 이동합니다.");
+          initStage3();
+        }, 400);
         return;
       }
       const item = s2Items[s2Index];
-      document.getElementById('s2-progress').innerText = s2Index + 1;
+      document.getElementById('s2-step').innerText = s2Index + 1;
       document.getElementById('s2-item-name').innerText = item.name;
       document.getElementById('s2-item-emoji').innerText = item.emoji;
       document.getElementById('s2-scan-btn').classList.remove('hidden');
@@ -506,26 +484,26 @@
     }
 
     function revealMark() {
-      soundCorrect();
+      soundSuccess();
       document.getElementById('s2-scan-btn').classList.add('hidden');
       const badge = document.getElementById('s2-mark-badge');
       badge.innerText = s2Items[s2Index].mark;
       badge.classList.remove('hidden');
     }
 
-    function checkBin(binType) {
+    function checkStage2Bin(binType) {
       if (s2Items[s2Index].bin === binType) {
-        soundCorrect();
-        addScore(70);
+        soundSuccess();
+        addScore(100);
         s2Index++;
         setTimeout(renderS2, 300);
       } else {
-        soundWrong();
+        soundFail();
         alert("❌ 다른 분리수거함입니다! 마크를 다시 확인하세요.");
       }
     }
 
-    // ================= [3단계: 4대 액션 챌린지 로직] =================
+    // ================= 3. [3단계: 4대 액션 챌린지] =================
     let s3Step = 1;
     let s3TapCount = 0;
 
@@ -547,25 +525,25 @@
       document.getElementById('s3-step-indicator').innerText = `ACTION ${s3Step} / 4`;
 
       if (s3Step === 1) {
-        title.innerText = "1. 비운다 : 음료를 탈탈 비워주세요!";
+        title.innerText = "1. 비운다: 내용물을 깨끗이 비워주세요!";
         desc.innerText = "페트병을 3번 터치하여 남은 음료를 쏟아내세요.";
         icon.innerText = "🥤";
         feedback.innerText = "터치하여 비우기 (0 / 3)";
         s3TapCount = 0;
       } else if (s3Step === 2) {
-        title.innerText = "2. 헹군다 : 물로 찌꺼기를 씻어내세요!";
+        title.innerText = "2. 헹군다: 물로 찌꺼기를 씻어내세요!";
         desc.innerText = "수도꼭지를 3번 터치해 깨끗이 헹궈주세요 🚿";
         icon.innerText = "🚿";
         feedback.innerText = "터치하여 헹구기 (0 / 3)";
         s3TapCount = 0;
       } else if (s3Step === 3) {
-        title.innerText = "3. 분리한다 : 비닐 라벨을 뜯어주세요!";
+        title.innerText = "3. 분리한다: 비닐 라벨을 뜯어주세요!";
         desc.innerText = "라벨 부분을 3번 터치해 뜯어내세요 ✂️";
         icon.innerText = "🏷️";
         feedback.innerText = "터치하여 라벨 뜯기 (0 / 3)";
         s3TapCount = 0;
       } else if (s3Step === 4) {
-        title.innerText = "4. 섞지 않는다 : 종류별로 바구니에 담기!";
+        title.innerText = "4. 섞지 않는다: 종류별로 바구니에 담기!";
         desc.innerText = "아래 3개 조각을 알맞은 분리수거함에 골라 담으세요.";
         icon.innerText = "🧺";
         feedback.innerText = "모든 조각을 알맞게 분류하세요!";
@@ -576,13 +554,12 @@
     function handleActionClick() {
       if (s3Step >= 4) return;
       s3TapCount++;
-      playBeep(400 + s3TapCount * 100, 'sine', 0.1);
-      document.getElementById('s3-tap-count') && (document.getElementById('s3-tap-count').innerText = s3TapCount);
+      soundPickup();
       document.getElementById('s3-action-feedback').innerText = `진행 중 (${s3TapCount} / 3)`;
 
       if (s3TapCount >= 3) {
-        soundCorrect();
-        addScore(80);
+        soundSuccess();
+        addScore(100);
         s3Step++;
         setTimeout(renderS3, 400);
       }
@@ -590,19 +567,23 @@
 
     let s3Separated = 0;
     function selectSeparateBin(type) {
-      soundCorrect();
+      soundSuccess();
       addScore(50);
       s3Separated++;
       if (s3Separated >= 3) {
-        finishStage(400, "3단계 4대 액션 챌린지 완벽 마스터!");
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        setTimeout(() => {
+          alert("🎉 [3단계 완료!] 4대 원칙을 완벽히 마스터했습니다!\n최종 보스전 60초 타임어택으로 이동합니다!");
+          initStage4();
+        }, 400);
       }
     }
 
-    // ================= [4단계: 60초 최종 보스 타임어택] =================
+    // ================= 4. [4단계: 60초 최종 타임어택] =================
     const s4Items = [
       { name: "라벨 붙은 투명 페트병", emoji: "🧴", correct: "action", hint: "⚠️ 라벨을 먼저 분리해야 해요!" },
       { name: "깨끗한 알루미늄 캔", emoji: "🥫", correct: "recycle", hint: "✨ 바로 캔류로 재활용 가능!" },
-      { name: "음식물 묻은 일회용기", emoji: "🥡", correct: "trash", hint: "❌ 씻기지 않는 양념은 일반쓰레기!" },
+      { name: "양념 묻은 일회용기", emoji: "🥡", correct: "trash", hint: "❌ 씻기지 않는 양념은 일반쓰레기!" },
       { name: "상자 테이프 안 뗀 박스", emoji: "📦", correct: "action", hint: "⚠️ 테이프를 먼저 떼야 해요!" },
       { name: "깨끗한 유리병", emoji: "🍾", correct: "recycle", hint: "✨ 바로 유리류로 재활용 가능!" }
     ];
@@ -626,7 +607,7 @@
         document.getElementById('s4-timer').innerText = s4Timer;
         if (s4Timer <= 0) {
           clearInterval(s4Interval);
-          finishStage(0, "최종 타임어택 종료!");
+          finishGame();
         }
       }, 1000);
     }
@@ -642,31 +623,30 @@
     function handleBossAction(act) {
       const item = s4Items[s4CurrentIdx];
       if (item.correct === act) {
-        soundCorrect();
+        soundSuccess();
         s4Combo++;
         addScore(50 + s4Combo * 10);
         document.getElementById('s4-combo').innerText = s4Combo;
       } else {
-        soundWrong();
+        soundFail();
         s4Combo = 0;
         document.getElementById('s4-combo').innerText = '0';
       }
       renderBossItem();
     }
 
-    // ================= [결과 및 스테이지 완료] =================
-    function finishStage(bonusPts, msg) {
-      addScore(bonusPts);
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    // ================= 5. [결과 화면] =================
+    function finishGame() {
+      confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
       showScreen('screen-result');
-      const school = document.getElementById('player-school').value || '우리학교';
-      const name = document.getElementById('player-name').value || '에코요원';
-      document.getElementById('result-user').innerText = `${school} ${name} 요원`;
+      document.getElementById('result-user').innerText = `${playerSchool} ${playerIdName} 요원`;
       document.getElementById('result-score').innerText = `${totalScore}점`;
     }
 
-    function returnToLobby() {
-      showScreen('screen-lobby');
+    function restartGame() {
+      totalScore = 0;
+      document.getElementById('global-score').innerText = '0';
+      showScreen('screen-login');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
